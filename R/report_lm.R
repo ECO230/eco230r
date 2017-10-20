@@ -1,7 +1,10 @@
 report_lm <- function(mod,vars) {
 names <- strsplit(vars,'\\~')
-y_name <- strsplit(names[[1]][[1]],'\\$')[[1]][[2]]
-x_name <- strsplit(names[[1]][[2]],'\\$')[[1]][[2]]
+y_name <- strsplit(names[[1]][[1]],'\\$')
+x_name <- strsplit(names[[1]][[2]],'\\$')
+y_name <- y_name[[1]][[length(y_name[[1]])]]
+x_name <- x_name[[1]][[length(x_name[[1]])]]
+
 
 an <- paste(c('Simple linear regression testing effect between ',y_name,'(y) and ',x_name, ' (x)'), collapse = '')
 

@@ -15,7 +15,7 @@ ost <- function(x, y = NULL, tails = 2, mu = 0.0) {
   } else {
     mod <- t.test(x, y, paired = FALSE, mu = mu)
   }
-  if (tails ==2) {
+  if (tails == 2) {
     an <- 'One Sample t-Test, Two Tailed test'
   } else {
     an <- 'One Sample t-Test, One Tailed test'
