@@ -38,7 +38,6 @@ desc_e <- function(x,y,analysis = c("ost", "pst", "idt", "lrm"), x_name, y_name)
                 Mean = signif(mean(x),3),
                 SE = signif(sqrt(var(x)/length(x)),3))))
     dsc <- as.data.frame(tmp)
-    dsc <- tmp
     colnames(dsc) <- c('Group','N','Mean','Standard.Error')
   }
 
