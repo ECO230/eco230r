@@ -1,4 +1,3 @@
-library(dplyr)
 desc_e <- function(x,y,analysis = c("ost", "pst", "idt", "lrm"), x_name, y_name){
 
   if (is.formula(x)) {
@@ -35,15 +34,13 @@ desc_e <- function(x,y,analysis = c("ost", "pst", "idt", "lrm"), x_name, y_name)
     colnames(dsc) <- c('N','Mean','Standard Error')
     row.names(dsc) <- c(x_name)
   } else {
-    dsc <- mf %>%
-      group_by(iv) %>%
-      summarize(N = signif(length(dv),3),
-                Mean = signif(mean(dv),3),
-                SE = signif(sqrt(var(dv)/length(dv)),3)) %>%
-      data.frame
+    tmp <- as.matrix(aggregate(. ~ iv, mf, function(x) c(N = signif(length(x),3),
+                Mean = signif(mean(x),3),
+                SE = signif(sqrt(var(x)/length(x)),3))))
+    dsc <- as.data.frame(tmp)
+    dsc <- tmp
     colnames(dsc) <- c('Group','N','Mean','Standard.Error')
   }
-
 
   dsc
 }
