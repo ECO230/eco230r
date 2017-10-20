@@ -10,7 +10,9 @@
 #' @return A list of output for reporting $analysis_type, $results, $descriptive_statistics
 #' @export
 #'
-#' @examples ost <- ost(idt_data$scones, tails = 1, mu = 44)
+#' @examples ost_results <- ost(idt_data$scones, tails = 1, mu = 44)
+#' ost_results <- ost(idt_data$scones ~ 1, tails = 1, mu = 44)
+#' ost_results <- ost(scones ~ 1, idt_data, tails = 1, mu = 44)
 ost <- function(x, y = NULL, tails = 2, mu = 0.0) {
   form <- is.formula(x)
 
