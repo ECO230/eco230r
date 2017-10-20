@@ -1,4 +1,4 @@
-desc_e <- function(x,y,analysis = c("ost", "pst", "idt", "lrm"), x_name, y_name){
+desc_e <- function(x,y,analysis = c("ost", "pst", "idt","ano", "lrm"), x_name, y_name){
 
   if (is.formula(x)) {
     #formula passed in for x
@@ -22,14 +22,14 @@ desc_e <- function(x,y,analysis = c("ost", "pst", "idt", "lrm"), x_name, y_name)
 
 
 
-  if (analysis == 'pst') {
+  if (analysis == 'pst' && !is.formula(x)) {
     dsc1 <- data.frame(length(x),mean(x),sqrt(var(x)/length(x)))
     colnames(dsc1) <- c('N','Mean','Standard Error')
     dsc2 <- data.frame(length(y),mean(y),sqrt(var(y)/length(y)))
     colnames(dsc2) <- c('N','Mean','Standard Error')
     dsc <- rbind(dsc1,dsc2)
     row.names(dsc) <- c(x_name, y_name)
-  } else if (analysis == 'ost') {
+  } else if (analysis == 'ost' && !is.formula(x)) {
     dsc <- data.frame(length(x),mean(x),sqrt(var(x)/length(x)))
     colnames(dsc) <- c('N','Mean','Standard Error')
     row.names(dsc) <- c(x_name)
