@@ -4,10 +4,16 @@ desc_e <- function(x,y,analysis = c("ost", "pst", "idt","ano", "lrm"), x_name, y
     #formula passed in for x
       if (missing(y)) {
       mf <- model.frame(x)
+
     } else {
       mf <- model.frame(x, y)
     }
+    if (length(colnames(mf)) == 1) {
+      colnames(mf) <- c('dv')
+    } else if (length(colnames(mf)) == 2) {
       colnames(mf) <- c('dv','iv')
+    }
+
   } else {
     #data passed in for x
     if (missing(y)) {
@@ -17,7 +23,6 @@ desc_e <- function(x,y,analysis = c("ost", "pst", "idt","ano", "lrm"), x_name, y
       tn <- strsplit(y_name,'\\$')
       y_name <- tn[[1]][[2]]
     }
-
   }
 
 
@@ -32,6 +37,14 @@ desc_e <- function(x,y,analysis = c("ost", "pst", "idt","ano", "lrm"), x_name, y
   } else if (analysis == 'ost' && !is.formula(x)) {
     dsc <- data.frame(length(x),mean(x),sqrt(var(x)/length(x)))
     colnames(dsc) <- c('N','Mean','Standard Error')
+    tn <- strsplit(x_name,'\\$')
+    x_name <- tn[[1]][[2]]
+    row.names(dsc) <- c(x_name)
+  } else if (analysis =='ost' && is.formula(x)) {
+    dsc <- data.frame(length(mf$dv),mean(mf$dv),sqrt(var(mf$dv)/length(mf$dv)))
+    colnames(dsc) <- c('N','Mean','Standard Error')
+    tn <- strsplit(x_name,'\\$')
+    x_name <- tn[[1]][[2]]
     row.names(dsc) <- c(x_name)
   } else {
     tmp <- as.matrix(aggregate(. ~ iv, mf, function(x) c(N = signif(length(x),3),
