@@ -2,7 +2,8 @@
 % Please edit documentation in R/idt.R
 \name{idt}
 \alias{idt}
-\title{Generate Output for an Independent t-test}
+\title{Generate Output for an Independent t-test
+This function will generate the output for an independent t-test.}
 \usage{
 idt(x, y = NULL, tails = 2)
 }
@@ -11,13 +12,14 @@ idt(x, y = NULL, tails = 2)
 
 \item{y}{A data frame, necessary if data frame is not referenced in formula, if a data frame variable is passed in to x, a data frame variable will also be accepted.}
 
-\item{tails}{an integer indicating whether the test is one-tailed '1' or two-tailed '2'}
+\item{tails}{An integer indicating whether the test is one-tailed '1' or two-tailed '2'}
 }
 \value{
 A list of output for reporting $analysis_type, $results, $descriptive_statistics
 }
 \description{
-'This function will generate the output for an independent t-test
+Generate Output for an Independent t-test
+This function will generate the output for an independent t-test.
 }
 \examples{
 idt_results <- idt(idt_data$scones ~ idt_data$tea, tails = 1)

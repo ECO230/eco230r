@@ -1,10 +1,9 @@
 #' Generate Output for an Independent t-test
-#'
-#''This function will generate the output for an independent t-test
+#' This function will generate the output for an independent t-test.
 #'
 #' @param x A formula dependent variable ~ dependent variable, a data frame variable can also be passed in.
 #' @param y A data frame, necessary if data frame is not referenced in formula, if a data frame variable is passed in to x, a data frame variable will also be accepted.
-#' @param tails an integer indicating whether the test is one-tailed '1' or two-tailed '2'
+#' @param tails An integer indicating whether the test is one-tailed '1' or two-tailed '2'
 #'
 #' @return A list of output for reporting $analysis_type, $results, $descriptive_statistics
 #' @export
