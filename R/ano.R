@@ -1,3 +1,16 @@
+#' Generate output for ANOVA
+#'
+#'This function will generate output for Analysis of Variance. Homogeneity of Variance (HOV) assumption is tested.  If AOV is assumed aov() is performed and Tukey's HSD are used for post hoc analysis. If HOV cannot be assumed robust ANOVA t1way() from WRS2 is used to perform analysis and linear constraints are used for post hoc analysis.
+#'
+#' @param formula A formula dependent variable ~ dependent variable.
+#' @param data A data frame, necessary if data frame is not referenced in formula.
+#' @param tr Optional, a double indicating percentage of means to trim for robust ANOVA, default value is 0.1
+#'
+#' @return A list of output for reporting $analysis_type, $results, $descriptive_statistics, $post_hoc_analysis
+#' @export
+#'
+#' @examples ano_results <- ano(sleeptime ~ light, ano_data)
+#' ano_results <- ano(ano_data$sleeptime ~ ano_data$light)
 ano <- function(formula, data = NULL, tr = .1) {
 
         if (missing(data)) {
