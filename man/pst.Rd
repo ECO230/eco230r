@@ -17,7 +17,7 @@ pst(x, y = NULL, tails = 2)
 A list of output for reporting $analysis_type, $results, $descriptive_statistics
 }
 \description{
-'This function will generate the output for a one sample t test.
+This function will generate the output for a one sample t test.
 }
 \examples{
 pst_results <- pst(pst_data$black_tea, pst_data$green_tea, tails = 1)

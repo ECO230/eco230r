@@ -1,6 +1,6 @@
 #' Generate Output for Paired Samples t-test
 #'
-#''This function will generate the output for a one sample t test.
+#'This function will generate the output for a one sample t test.
 #'
 #' @param x A data frame column with the first variable to compare, a formula can also be passed in
 #' @param y A data frame column with the second variable to compare, if a formula is passed in a data frame will be accepted

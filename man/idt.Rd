@@ -2,8 +2,7 @@
 % Please edit documentation in R/idt.R
 \name{idt}
 \alias{idt}
-\title{Generate Output for an Independent t-test
-This function will generate the output for an independent t-test.}
+\title{Generate Output for an Independent t-test}
 \usage{
 idt(x, y = NULL, tails = 2)
 }
@@ -18,7 +17,6 @@ idt(x, y = NULL, tails = 2)
 A list of output for reporting $analysis_type, $results, $descriptive_statistics
 }
 \description{
-Generate Output for an Independent t-test
 This function will generate the output for an independent t-test.
 }
 \examples{

@@ -1,5 +1,6 @@
 #' Generate Output for an Independent t-test
-#' This function will generate the output for an independent t-test.
+#'
+#'This function will generate the output for an independent t-test.
 #'
 #' @param x A formula dependent variable ~ dependent variable, a data frame variable can also be passed in.
 #' @param y A data frame, necessary if data frame is not referenced in formula, if a data frame variable is passed in to x, a data frame variable will also be accepted.
