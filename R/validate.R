@@ -1,4 +1,14 @@
-#Return something from a 4 digit seed
+#' Return a list of 5 random words given a 4 digit numeric id
+#'
+#'This function is used during setup to validate that a student was able to install the eco230r package
+#'
+#' @param ID4 a 4 digit id this must be a number that is 4 digits long
+#'
+#' @return A string containing 5 random words and the ID that was passed into the function
+#' @export
+#'
+#' @examples validation <- validate(1234)
+
 validate <- function(ID4) {
 
 if(!is.numeric(ID4))
