@@ -25,7 +25,7 @@ desc_e <- function(x,y,analysis = c("ost", "pst", "idt","ano", "lrm"), x_name, y
       tn <- strsplit(y_name,'\\$')
       y_name <- tn[[1]][[length(tn[[1]])]]
 
-      if (missing(y)) {
+      if (is.null(y)) {
         #Ignore Null Values
         x <- x[complete.cases(x)]
       } else {
