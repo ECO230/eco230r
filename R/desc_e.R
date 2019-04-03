@@ -4,9 +4,13 @@ desc_e <- function(x,y,analysis = c("ost", "pst", "idt","ano", "lrm"), x_name, y
     #formula passed in for x
       if (missing(y)) {
       mf <- model.frame(x)
+      #Ignore Null Values
+      mf <- mf[complete.cases(mf),]
 
     } else {
       mf <- model.frame(x, y)
+      #Ignore Null Values
+      mf <- mf[complete.cases(mf),]
     }
     if (length(colnames(mf)) == 1) {
       colnames(mf) <- c('dv')
@@ -17,8 +21,12 @@ desc_e <- function(x,y,analysis = c("ost", "pst", "idt","ano", "lrm"), x_name, y
   } else {
     #data passed in for x
       tn <- strsplit(x_name,'\\$')
+      #Ignore Null Values
+      tn <- tn[complete.cases(tn),]
       x_name <- tn[[1]][[length(tn[[1]])]]
       tn <- strsplit(y_name,'\\$')
+      #Ignore Null Values
+      tn <- tn[complete.cases(tn),]
       y_name <- tn[[1]][[length(tn[[1]])]]
   }
 
