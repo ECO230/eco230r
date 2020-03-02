@@ -53,3 +53,47 @@ report_csi <- function(mod,vars) {
   } else {
     OR <- "Odd Ratio only calculated for 2x2 contingency tables."
   }
+
+
+  tab <- round(prop.table(mod$observed)*100,2)
+  tab <- paste(tab,'%')
+  attributes(tab) <- attributes(mod$residuals)
+  tab <- data.frame(tab)
+  colnames(tab) <- c(y_name,x_name,'Freq')
+  tab <- tab %>% pivot_wider(names_from=x_name,values_from = Freq)
+
+  col <- round(prop.table(mod$observed,2)*100,2)
+  col <- paste(col,'%')
+  attributes(col) <- attributes(mod$residuals)
+  col <- data.frame(col)
+  colnames(col) <- c(y_name,x_name,'Freq')
+  col <- col %>% pivot_wider(names_from=x_name,values_from = Freq)
+
+  roe <- round(prop.table(mod$observed,1)*100,2)
+  roe <- paste(roe,'%')
+  attributes(roe) <- attributes(mod$residuals)
+  roe <- data.frame(roe)
+  colnames(roe) <- c(y_name,x_name,'Freq')
+  roe <- roe %>% pivot_wider(names_from=x_name,values_from = Freq)
+
+  exp <- data.frame(mod$expected)
+
+  std <- data.frame(mod$stdres)
+  colnames(std) <- c(y_name,x_name,'Freq')
+  std <- std %>% pivot_wider(names_from=x_name,values_from = Freq)
+
+
+  con <- round(100*mod$residuals^2/mod$statistic,2)
+  con <- paste(con,'%')
+  attributes(con) <- attributes(mod$residuals)
+  con <- data.frame(con)
+  colnames(con) <- c(y_name,x_name,'Freq')
+  con <- con %>% pivot_wider(names_from=x_name,values_from = Freq)
+
+  res <- paste(c('X2(', round(Df,2), ') = ', round(Xv,3),', p = ', round(p,3)), collapse = '')
+
+  list('analysis_type' = an,'results' = res,'odds_ratio' = OR, 'observed' = obs, 'expected' = exp,
+       'standardized_residuals' = std, 'contribution' = con, 'table_percentages' = tab,
+       'column_percentages' = col, 'row_percentages' = roe)
+
+}
