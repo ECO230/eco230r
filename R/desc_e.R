@@ -2,7 +2,7 @@ desc_e <- function(x,y,analysis = c("ost", "pst", "idt","ano", "lrm"), x_name, y
 
   if (is.formula(x)) {
     #formula passed in for x
-      if (missing(y)) {
+    if (missing(y)) {
       mf <- model.frame(x)
       #Ignore Null Values
       mf <- mf[complete.cases(mf),]
@@ -20,19 +20,19 @@ desc_e <- function(x,y,analysis = c("ost", "pst", "idt","ano", "lrm"), x_name, y
 
   } else {
     #data passed in for x
-      tn <- strsplit(x_name,'\\$')
-      x_name <- tn[[1]][[length(tn[[1]])]]
-      tn <- strsplit(y_name,'\\$')
-      y_name <- tn[[1]][[length(tn[[1]])]]
+    tn <- strsplit(x_name,'\\$')
+    x_name <- tn[[1]][[length(tn[[1]])]]
+    tn <- strsplit(y_name,'\\$')
+    y_name <- tn[[1]][[length(tn[[1]])]]
 
-      if (is.null(y)) {
-        #Ignore Null Values
-        x <- x[complete.cases(x)]
-      } else {
-        #Ignore Null Values
-        x <- x[complete.cases(x)]
-        y <- y[complete.cases(y)]
-      }
+    if (is.null(y)) {
+      #Ignore Null Values
+      x <- x[complete.cases(x)]
+    } else {
+      #Ignore Null Values
+      x <- x[complete.cases(x)]
+      y <- y[complete.cases(y)]
+    }
 
   }
 
@@ -52,7 +52,7 @@ desc_e <- function(x,y,analysis = c("ost", "pst", "idt","ano", "lrm"), x_name, y
     x_name <- tn[[1]][[length(tn[[1]])]]
     row.names(dsc) <- c(x_name)
   } else if (analysis =='ost' && is.formula(x)) {
-    dsc <- data.frame(length(mf$dv),mean(mf$dv),sqrt(var(mf$dv)/length(mf$dv)))
+    dsc <- data.frame(length(mf),mean(mf),sqrt(var(mf)/length(mf)))
     colnames(dsc) <- c('N','Mean','Standard Error')
     tn <- strsplit(x_name,'\\$')
     x_name <- tn[[1]][[length(tn[[1]])]]
@@ -64,15 +64,13 @@ desc_e <- function(x,y,analysis = c("ost", "pst", "idt","ano", "lrm"), x_name, y
     colnames(dsc2) <- c('N','Mean','Standard Error')
     dsc <- rbind(dsc1,dsc2)
     row.names(dsc) <- c(x_name, y_name)
-    } else {
+  } else {
     tmp <- as.matrix(aggregate(. ~ iv, mf, function(x) c(N = signif(length(x),3),
-                Mean = signif(mean(x),3),
-                SE = signif(sqrt(var(x)/length(x)),3))))
+                                                         Mean = signif(mean(x),3),
+                                                         SE = signif(sqrt(var(x)/length(x)),3))))
     dsc <- as.data.frame(tmp)
     colnames(dsc) <- c('Group','N','Mean','Standard.Error')
   }
 
   dsc
 }
-
-
