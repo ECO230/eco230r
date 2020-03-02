@@ -2,7 +2,7 @@
 #'
 #'This function performs a simple linear regression and returns reporting information on the model.
 #'
-#' @param x A formula dependent varialbe ~ independent variable.
+#' @param x A formula dependent variable ~ independent variable.
 #' @param y A data frame, necessary if data frame is not referenced in formula or piped in.
 #'
 #' @return A list of output for reporting $analysis_type, $results, $linear_regression_model, $predictors, $coefficients
