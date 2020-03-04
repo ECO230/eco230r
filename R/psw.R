@@ -1,6 +1,6 @@
-#' Generate Output for Paired Samples t-test
+#' Generate Output for Wilcoxon Signed-Rank Test
 #'
-#'This function will generate the output for a paired samples t-test.
+#'This function will generate the output for a Wilcoxon Signed-Rank Test for non-parametric paired samples
 #'
 #' @param x A data frame column with the first variable to compare, a formula can also be passed in (~Var or Var~1)
 #' @param y A data frame column with the second variable to compare (~Var or Var~1), if a formula is passed in a data frame will be accepted
@@ -10,18 +10,18 @@
 #' @return A list of output for reporting $analysis_type, $results, $descriptive_statistics
 #' @export
 #'
-#' @examples pst_results <- pst_data %>% pst(~scones,~tea)
-#' pst_results <- pst(pst_data$black_tea, pst_data$green_tea, tails = 1)
-#' pst_results <- pst(pst_data$black_tea, pst_data$green_tea, tails = 2)
-#' pst_results <- pst(scones ~ tea, pst_data_tall, tails = 1)
-pst <- function(x, y = NULL, z = NULL, tails = 2) {
+#' @examples psw_results <- pst_data %>% psw(~scones,~tea)
+#' psw_results <- psw(pst_data$black_tea, pst_data$green_tea, tails = 1)
+#' psw_results <- psw(pst_data$black_tea, pst_data$green_tea, tails = 2)
+#' psw_results <- psw(scones ~ tea, pst_data_tall, tails = 1)
+psw <- function(x, y = NULL, z = NULL, tails = 2) {
+
   fdn <- is.formula(x) * is.data.frame(y) * missing(z)
   dfn <- is.data.frame(x) * is.formula(y) * missing(z)
   ffd <- is.formula(x) * is.formula(y) * is.data.frame(z)
   dff <- is.data.frame(x) * is.formula(y) * is.formula(z)
   vvn <- is.vector(x) * is.vector(y) * missing(z)
   vvd <- is.vector(x) * is.vector(y) * is.data.frame(z)
-
 
   if (fdn) {
     #formula in x data in y
@@ -49,26 +49,48 @@ pst <- function(x, y = NULL, z = NULL, tails = 2) {
   }
 
   #build model
-  mod <- t.test(mf_x, mf_y, paired = TRUE)
+  mod <- wilcox.test(mf_x, mf_y,paired=TRUE,correct=FALSE)
   if (tails ==2) {
-    an <- 'Paired Samples t-Test, Two Tailed test'
+    an <- 'Wilcoxon Signed-Rank Test (Paired Samples), Two Tailed test'
   } else {
-    an <- 'Paired Samples t-Test, One Tailed test'
+    an <- 'Wilcoxon Signed-Rank Test (Paired Samples), One Tailed test'
   }
 
+
+  V <- mod$statistic
+  p <- mod$p.value
+  N <- length(mf_x)
+  Z <- abs(qnorm(p/2))
+  r <- Z/sqrt(N)
+  if (tails == 1) {p <- p/2}
+  res <- paste(c('p = ', round(p,3),', r = ',round(r,3)), collapse = '')
+
   #descriptives
-  res_list <- report_t(mod, tails = tails, an)
+
   if (fdn | dfn) {
-    dsc <- desc_e(mf_x, mf_y, 'pst',names(mf)[1],names(mf)[2])
+    x_name <- names(mf)[1]
+    y_name <- names(mf)[2]
   }
   else if (ffd) {
-    dsc <- desc_e(mf_x, mf_y, 'pst',names(model.frame(x,z))[1],names(model.frame(y,z))[1])
+    x_name <- names(model.frame(x,z))[1]
+    y_name <- names(model.frame(y,z))[1]
   }
   else if (dff) {
-    dsc <- desc_e(mf_x, mf_y, 'pst',names(model.frame(y,x))[1],names(model.frame(z,x))[1])
+    x_name <- names(model.frame(y,x))[1]
+    y_name <- names(model.frame(z,x))[1]
   }
   else if (vvn | vvd) {
-    dsc <- desc_e(mf_x, mf_y, 'pst',deparse(substitute(x)),deparse(substitute(y)))
+    x_name <- deparse(substitute(x))
+    y_name <- deparse(substitute(y))
   }
-  list('analysis_type' = res_list[[1]], 'results' = res_list[[2]], 'descriptive_statistics' = dsc)
+
+  dsc1 <- data.frame(length(mf_x),median(mf_x))
+  colnames(dsc1) <- c('N','Median')
+  dsc2 <- data.frame(length(mf_x),median(mf_y))
+  colnames(dsc2) <- c('N','Median')
+  dsc <- rbind(dsc1,dsc2)
+  row.names(dsc) <- c(x_name, y_name)
+
+  list('analysis_type' = an, 'results' = res, 'descriptive_statistics' = dsc)
+
 }
