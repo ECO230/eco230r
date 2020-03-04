@@ -10,7 +10,7 @@
 #'
 #' @examples x2_results <- x2_data %>% csi(class_rank ~ gender)
 #' x2_results <- csi(class_rank ~ gender, x2_data)
-#' x2_results < csi(x2_data$class_rank, x2_data$gender)
+#' x2_results <- csi(x2_data$class_rank, x2_data$gender)
 csi <- function(x,y=NULL,z=NULL) {
   fdn <- is.formula(x) * is.data.frame(y) * missing(z)
   dfn <- is.data.frame(x) * is.formula(y) * missing(z)
