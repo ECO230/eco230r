@@ -40,28 +40,28 @@ desc_e <- function(x,y,analysis = c("ost", "pst", "idt","ano", "lrm"), x_name, y
 
   if (analysis == 'pst' && !is.formula(x)) {
     dsc1 <- data.frame(length(x),mean(x),sqrt(var(x)/length(x)))
-    colnames(dsc1) <- c('N','Mean','Standard Error')
+    colnames(dsc1) <- c('N','Mean','Standard_Error')
     dsc2 <- data.frame(length(y),mean(y),sqrt(var(y)/length(y)))
-    colnames(dsc2) <- c('N','Mean','Standard Error')
+    colnames(dsc2) <- c('N','Mean','Standard_Error')
     dsc <- rbind(dsc1,dsc2)
     row.names(dsc) <- c(x_name, y_name)
   } else if (analysis == 'ost' && !is.formula(x)) {
     dsc <- data.frame(length(x),mean(x),sqrt(var(x)/length(x)))
-    colnames(dsc) <- c('N','Mean','Standard Error')
+    colnames(dsc) <- c('N','Mean','Standard_Error')
     tn <- strsplit(x_name,'\\$')
     x_name <- tn[[1]][[length(tn[[1]])]]
     row.names(dsc) <- c(x_name)
   } else if (analysis =='ost' && is.formula(x)) {
     dsc <- data.frame(length(mf),mean(mf),sqrt(var(mf)/length(mf)))
-    colnames(dsc) <- c('N','Mean','Standard Error')
+    colnames(dsc) <- c('N','Mean','Standard_Error')
     tn <- strsplit(x_name,'\\$')
     x_name <- tn[[1]][[length(tn[[1]])]]
     row.names(dsc) <- c(x_name)
   } else if (analysis == 'idt' && !is.formula(x)) {
     dsc1 <- data.frame(length(x),mean(x),sqrt(var(x)/length(x)))
-    colnames(dsc1) <- c('N','Mean','Standard Error')
+    colnames(dsc1) <- c('N','Mean','Standard_Error')
     dsc2 <- data.frame(length(y),mean(y),sqrt(var(y)/length(y)))
-    colnames(dsc2) <- c('N','Mean','Standard Error')
+    colnames(dsc2) <- c('N','Mean','Standard_Error')
     dsc <- rbind(dsc1,dsc2)
     row.names(dsc) <- c(x_name, y_name)
   } else {
@@ -69,7 +69,7 @@ desc_e <- function(x,y,analysis = c("ost", "pst", "idt","ano", "lrm"), x_name, y
                                                          Mean = signif(mean(x),3),
                                                          SE = signif(sqrt(var(x)/length(x)),3))))
     dsc <- as.data.frame(tmp)
-    colnames(dsc) <- c('Group','N','Mean','Standard.Error')
+    colnames(dsc) <- c('Group','N','Mean','Standard_Error')
   }
 
   dsc
