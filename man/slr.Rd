@@ -4,12 +4,12 @@
 \alias{slr}
 \title{Generate output for a Simple Linear Regression}
 \usage{
-slr(formula, data = NULL)
+slr(x, y = NULL)
 }
 \arguments{
-\item{formula}{A formula dependent varialbe ~ independent variable.}
+\item{x}{A formula dependent variable ~ independent variable.}
 
-\item{data}{A data frame, necessary if data frame is not referenced in formula.}
+\item{y}{A data frame, necessary if data frame is not referenced in formula or piped in.}
 }
 \value{
 A list of output for reporting $analysis_type, $results, $linear_regression_model, $predictors, $coefficients
@@ -18,7 +18,8 @@ A list of output for reporting $analysis_type, $results, $linear_regression_mode
 This function performs a simple linear regression and returns reporting information on the model.
 }
 \examples{
-slr_results <- slr(sales ~ adverts, sales)
-slr_results < slr(sales$sales ~ sales$adverts)
+slr_results <- sales_data \%>\% slr(sales ~ adverts)
+slr_results <- slr(sales ~ adverts, sales_data)
+slr_results < slr(sales_data$sales ~ sales_data$adverts)
 }
 

@@ -4,12 +4,12 @@
 \alias{ano}
 \title{Generate output for ANOVA}
 \usage{
-ano(formula, data = NULL, tr = 0.1)
+ano(x, y = NULL, tr = 0.1)
 }
 \arguments{
-\item{formula}{A formula dependent variable ~ dependent variable.}
+\item{x}{A formula dependent variable ~ dependent variable.}
 
-\item{data}{A data frame, necessary if data frame is not referenced in formula.}
+\item{y}{Optional A data frame, necessary if data frame is not referenced in formula or piped in.}
 
 \item{tr}{Optional, a double indicating percentage of means to trim for robust ANOVA, default value is 0.1}
 }
@@ -20,6 +20,8 @@ A list of output for reporting $analysis_type, $results, $descriptive_statistics
 This function will generate output for Analysis of Variance. Homogeneity of Variance (HOV) assumption is tested.  If AOV is assumed aov() is performed and Tukey's HSD are used for post hoc analysis. If HOV cannot be assumed robust ANOVA t1way() from WRS2 is used to perform analysis and linear constraints are used for post hoc analysis.
 }
 \examples{
+ano_results <- ano_data \%>\% ano(sleeptime ~ light)
+ano_results <- ano(sleeptime ~ light, ano_data)
 ano_results <- ano(sleeptime ~ light, ano_data)
 ano_results <- ano(ano_data$sleeptime ~ ano_data$light)
 }
