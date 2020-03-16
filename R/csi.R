@@ -38,14 +38,14 @@ csi <- function(x,y=NULL,z=NULL) {
     mf1 = model.frame(y,z)
     mf_x <- mf[[1]]
     mf_y <- mf1[[1]]
-    formula <- paste(c(sub('~','',sub('~1','',x)),'~',sub('~','',sub('~1','',x))),collapse = '')
+    formula <- paste(c(sub('~','',sub('~1','',x)),'~',sub('~','',sub('~1','',y))),collapse = '')
   }
   else if (dff) {
     mf = model.frame(y,x)
     mf1 = model.frame(z,x)
     mf_x <- mf[[1]]
     mf_y <- mf1[[1]]
-    formula <- paste(c(sub('~','',sub('~1','',x)),'~',sub('~','',sub('~1','',x))),collapse = '')
+    formula <- paste(c(sub('~','',sub('~1','',y)),'~',sub('~','',sub('~1','',z))),collapse = '')
   }
   else if (vvn | vvd) {
     mf_x <- x
