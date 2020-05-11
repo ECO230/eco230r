@@ -3,19 +3,21 @@
 #'This function will load the data for this section's final exam
 #' @export
 final_load <- function(){
-library(digest)
-    tm <- Sys.time()
+  library(lubridate)
+  library(digest)
+  tm <- Sys.time()
   Usr <- Sys.getenv('RSTUDIO_USER_IDENTITY_DISPLAY')
 
   if (!file.exists('pbgc_clean.csv')) {
     df <-read.csv('https://raw.githubusercontent.com/ECO230/rstudio-course/master/pbgc_clean.csv')
-    fud <- (1000*60*60*12)
+    ldtm <- ymd_hms(tm)
+    fud <- ldtm - years(2) - months(1) - days(7) - minutes(42)
     Sys.setenv(R_FINAL_FILE_TIME = as.character(tm))
     Sys.setenv(R_FINAL_USER = Usr)
     df$ID <- seq.int(nrow(df))
     hash <- digest(Usr,algo='sha256')
     df$PIN <- paste(hash,df$ID, sep = '')
-    df$Data_Accessed = tm - fud
+    df$Data_Accessed = fud
     df <- subset(df, select = -c(ID))
     write.csv(df,'pbgc_clean.csv',row.names = FALSE)
     dhash <- digest(read_csv('pbgc_clean.csv'), algo="sha256")
@@ -34,3 +36,4 @@ library(digest)
     }
   }
 }
+
