@@ -1,3 +1,7 @@
+#' This is a helper function for the final exam
+#'
+#'This function will load the data for this section's final exam
+#' @export
 final_load <- function(){
 library(digest)
     tm <- Sys.time()
