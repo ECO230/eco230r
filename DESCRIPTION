@@ -11,5 +11,6 @@ Encoding: UTF-8
 LazyData: true
 Imports:
     car,
-    WRS2
+    WRS2,
+    BayesFactor
 RoxygenNote: 5.0.1

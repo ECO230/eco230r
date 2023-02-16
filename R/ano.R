@@ -68,6 +68,8 @@ ano <- function(x, y = NULL, tr = .1) {
     ph <- pd[,c('psihat','p.value')]
     colnames(ph) <- c('Difference','P.Value')
     ph$P.Value <- signif(ph$P.Value,3)
+    bf <- anovaBF(mf)
+    byfct <- as.data.frame(bf)[1,'bf']
 
 
   } else {
@@ -90,8 +92,10 @@ ano <- function(x, y = NULL, tr = .1) {
     ph <- ph[,c('diff','p.adj')]
     colnames(ph) <- c('Difference','P.Value')
     ph$P.Value <- signif(ph$P.Value,3)
+    bf <- anovaBF(mf)
+    byfct <- as.data.frame(bf)[1,'bf']
   }
-  res <- paste(c('F(', round(Dfm,2), ',', round(Dfr,2), ') = ', round(Fv,3),', p = ', round(p,3),', w = ',round(w,3)), collapse = '')
+  res <- paste(c('F(', round(Dfm,2), ',', round(Dfr,2), ') = ', round(Fv,3),', p = ', round(p,3),', w = ',round(w,3),' bf = ',round(byfct,3)), collapse = '')
   dsc <- desc_e(x = formula, y = data, 'ano',deparse(substitute(formula)),deparse(substitute(data)))
   list('analysis_type' = an,'results' = res,'descriptive_statistics' = dsc,'post_hoc_analysis' = ph)
 }
