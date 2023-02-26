@@ -23,17 +23,41 @@ ost <- function(x, y = NULL, tails = 2, mu = 0.0) {
   if (fd) {
     #formula in x data in y
     mf <- model.frame(x,y)
+    nf <- mf
+    nf$mu = mu
   }
   else if (df) {
     #data in x formula in y
     mf <- model.frame(y,x)
+    nf <- mf
+    nf$mu = mu
   }
 
   #build model
   if (fd | df) {
     mod <- t.test(mf, paired = FALSE, mu = mu)
+
+    tryCatch({
+      bf <- '--'
+      bf <- ttestBF(nf[,1],nf[,2],paired=TRUE)
+    },error=function(e) {
+      print(e)
+    }
+    )
+
   } else if (vd | vn) {
     mod <- t.test(x, paired = FALSE, mu = mu)
+    nf <- data.frame(x)
+    nf$mu = mu
+
+    tryCatch({
+      bf <- '--'
+      bf <- ttestBF(nf[,1],nf[,2],paired=TRUE)
+    },error=function(e) {
+      print(e)
+    }
+    )
+
   }
 
   if (tails == 2) {
@@ -43,7 +67,7 @@ ost <- function(x, y = NULL, tails = 2, mu = 0.0) {
   }
 
   #descriptives
-  res_list <- report_t(mod, tails = tails, an)
+  res_list <- report_t(mod, tails = tails, an,bayes_factor = bf)
   if (fd) {
     dsc <-desc_e(x, y, 'ost', colnames(mf)[1],deparse(substitute(y)))
   }

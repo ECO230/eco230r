@@ -50,10 +50,29 @@ psw <- function(x, y = NULL, z = NULL, tails = 2) {
 
   #build model
   mod <- wilcox.test(mf_x, mf_y,paired=TRUE,correct=FALSE)
+
+  tryCatch({
+    bf <- '--'
+    library(bayesWilcoxTest)
+    bf <- bayes.wilcox.test(f_x, mf_y,paired=TRUE,correct=FALSE)
+  },error=function(e) {
+    print(e)
+  }
+  )
+
   if (tails ==2) {
     an <- 'Wilcoxon Signed-Rank Test (Paired Samples), Two Tailed test'
   } else {
     an <- 'Wilcoxon Signed-Rank Test (Paired Samples), One Tailed test'
+  }
+
+  if(typeof(bf)=='character'){
+    #error in bayes factor calculation should return bf <- '-'
+    byfct <- bf
+  }
+  else{
+    byfct <- summary(bf)[7]
+    byfct <- round(byfct,3)
   }
 
 
@@ -63,7 +82,7 @@ psw <- function(x, y = NULL, z = NULL, tails = 2) {
   Z <- abs(qnorm(p/2))
   r <- Z/sqrt(N)
   if (tails == 1) {p <- p/2}
-  res <- paste(c('p = ', round(p,3),', r = ',round(r,3)), collapse = '')
+  res <- paste(c('p = ', round(p,3),', r = ',round(r,3),', bf10 = ',byfct), collapse = '')
 
   #descriptives
 

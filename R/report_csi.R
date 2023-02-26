@@ -1,4 +1,4 @@
-report_csi <- function(mod,vars) {
+report_csi <- function(mod,vars,bayes_factor) {
   names <- strsplit(vars,'\\~')
   y_name <- strsplit(names[[1]][[1]],'\\$')
   x_name <- strsplit(names[[1]][[2]],'\\$')
@@ -90,7 +90,16 @@ report_csi <- function(mod,vars) {
   colnames(con) <- c(y_name,x_name,'Freq')
   con <- con %>% pivot_wider(names_from=x_name,values_from = Freq)
 
-  res <- paste(c('X2(', round(Df,2), ') = ', round(Xv,3),', p = ', round(p,3)), collapse = '')
+  if(typeof(bayes_factor)=='character'){
+    #error in bayes factor calculation should return bf <- '-'
+    byfct <- bayes_factor
+  }
+  else{
+    byfct <- as.data.frame(bayes_factor)[1,'bf']
+    byfct <- round(byfct,3)
+  }
+
+  res <- paste(c('X2(', round(Df,2), ') = ', round(Xv,3),', p = ', round(p,3), ', bf10 = ',byfct), collapse = '')
 
   list('analysis_type' = an,'results' = res,'odds_ratio' = OR, 'observed' = obs, 'expected' = exp,
        'standardized_residuals' = std, 'contribution' = con, 'table_percentages' = tab,

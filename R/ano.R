@@ -68,9 +68,13 @@ ano <- function(x, y = NULL, tr = .1) {
     ph <- pd[,c('psihat','p.value')]
     colnames(ph) <- c('Difference','P.Value')
     ph$P.Value <- signif(ph$P.Value,3)
-    bf <- anovaBF(mf)
-    byfct <- as.data.frame(bf)[1,'bf']
-
+    tryCatch({
+      bf <- '--'
+      bf <- anovaBF(mf)
+    },error=function(e) {
+      print(e)
+    }
+    )
 
   } else {
     aov <- aov(mf)
@@ -92,10 +96,25 @@ ano <- function(x, y = NULL, tr = .1) {
     ph <- ph[,c('diff','p.adj')]
     colnames(ph) <- c('Difference','P.Value')
     ph$P.Value <- signif(ph$P.Value,3)
-    bf <- anovaBF(mf)
-    byfct <- as.data.frame(bf)[1,'bf']
+    tryCatch({
+      bf <- '--'
+      bf <- anovaBF(formula,mf)
+    },error=function(e) {
+      print(e)
+    }
+    )
   }
-  res <- paste(c('F(', round(Dfm,2), ',', round(Dfr,2), ') = ', round(Fv,3),', p = ', round(p,3),', w = ',round(w,3),' bf = ',round(byfct,3)), collapse = '')
+
+  if(typeof(bf)=='character'){
+    #error in bayes factor calculation should return bf <- '-'
+    byfct <- bf
+    }
+  else{
+    byfct <- as.data.frame(bf)[1,'bf']
+    byfct <- round(byfct,3)
+  }
+
+  res <- paste(c('F(', round(Dfm,2), ',', round(Dfr,2), ') = ', round(Fv,3),', p = ', round(p,3),', w = ',round(w,3),', bf10 = ',byfct), collapse = '')
   dsc <- desc_e(x = formula, y = data, 'ano',deparse(substitute(formula)),deparse(substitute(data)))
   list('analysis_type' = an,'results' = res,'descriptive_statistics' = dsc,'post_hoc_analysis' = ph)
 }

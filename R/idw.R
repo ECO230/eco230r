@@ -28,10 +28,30 @@ idw <- function(x, y = NULL, tails = 2) {
 
   #build model
   mod <- wilcox.test(m_x, m_y, paired = FALSE)
+
+  tryCatch({
+    bf <- '--'
+    library(bayesWilcoxTest)
+    bf <- bayes.wilcox.test(m_x, m_y, paired = FALSE)
+  },error=function(e) {
+    print(e)
+  }
+  )
+
+
   if (tails ==2) {
     an <- 'Wilcoxon Rank-Sum Test (Independent Samples), Two Tailed test'
   } else {
     an <- 'Wilcoxon Rank-Sum Test (Independent Samples), One Tailed test'
+  }
+
+  if(typeof(bf)=='character'){
+    #error in bayes factor calculation should return bf <- '-'
+    byfct <- bf
+  }
+  else{
+    byfct <- summary(bf)[7]
+    byfct <- round(byfct,3)
   }
 
   W <- mod$statistic
@@ -40,7 +60,7 @@ idw <- function(x, y = NULL, tails = 2) {
   z <- abs(qnorm(p/2))
   r <- z/sqrt(N)
   if (tails == 1) {p <- p/2}
-  res <- paste(c('W = ', round(W,3),', p = ', round(p,3),', r = ',round(r,3)), collapse = '')
+  res <- paste(c('W = ', round(W,3),', p = ', round(p,3),', r = ',round(r,3),', bf10 = ',byfct), collapse = '')
   #descriptives
   colnames(mf) <- c('dv','iv')
   tmp <- as.matrix(aggregate(. ~ iv, mf, function(x) c(N = signif(length(x),3),

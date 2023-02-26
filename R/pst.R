@@ -50,6 +50,15 @@ pst <- function(x, y = NULL, z = NULL, tails = 2) {
 
   #build model
   mod <- t.test(mf_x, mf_y, paired = TRUE)
+
+  tryCatch({
+    bf <- '--'
+    bf <- ttestBF(mf_x,mf_y,paired=TRUE)
+  },error=function(e) {
+    print(e)
+  }
+  )
+
   if (tails ==2) {
     an <- 'Paired Samples t-Test, Two Tailed test'
   } else {
@@ -57,7 +66,7 @@ pst <- function(x, y = NULL, z = NULL, tails = 2) {
   }
 
   #descriptives
-  res_list <- report_t(mod, tails = tails, an)
+  res_list <- report_t(mod, tails = tails, an,bayes_factor = bf)
   if (fdn | dfn) {
     dsc <- desc_e(mf_x, mf_y, 'pst',names(mf)[1],names(mf)[2])
   }

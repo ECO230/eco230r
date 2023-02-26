@@ -28,7 +28,15 @@ idt <- function(x, y = NULL, tails = 2) {
 
   #build model
   mod <- t.test(m_x, m_y, paired = FALSE)
-  bf <- ttestBF(formula = m_x, data = m_y)
+
+  tryCatch({
+    bf <- '--'
+    bf <- ttestBF(formula = m_x, data = m_y)
+  },error=function() {
+    print(e)
+  }
+  )
+
   if (tails ==2) {
     an <- 'Independent t-Test, Two Tailed test'
   } else {

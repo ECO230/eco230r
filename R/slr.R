@@ -35,7 +35,15 @@ slr <- function(x, y = NULL) {
   #Build Model
   mod <- lm(formula = formula, data = data, na.action = na.exclude)
 
+  tryCatch({
+    bf <- '--'
+    bf <- regressionBF(formula = formula, data = data)
+  },error=function(e) {
+    print(e)
+  }
+  )
+
   #descriptives
-  res_list <- report_lm(mod,deparse(formula))
+  res_list <- report_lm(mod,deparse(formula),bayes_factor=bf)
   res_list
 }

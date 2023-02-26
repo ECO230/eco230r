@@ -56,8 +56,17 @@ csi <- function(x,y=NULL,z=NULL) {
   #build model
   mod = chisq.test(mf_x,mf_y)
 
+  tryCatch({
+    bf <- '--'
+    bf <- contingencyTableBF(mod$observed, sampleType = "indepMulti", fixedMargin = "cols")
+  },error=function(e) {
+    print(e)
+  }
+  )
+
+
   #descriptives
-  res_list <- report_csi(mod,deparse(formula))
+  res_list <- report_csi(mod,deparse(formula),bayes_factor=bf)
   res_list
 
 }
