@@ -32,7 +32,7 @@ idt <- function(x, y = NULL, tails = 2) {
   tryCatch({
     bf <- '--'
     bf <- ttestBF(formula = m_x, data = m_y)
-  },error=function() {
+  },error=function(e) {
     print(e)
   }
   )
