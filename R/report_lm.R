@@ -21,12 +21,12 @@ slope <- sum$coefficients[2,1]
 intercept <- sum$coefficients[1,1]
 signed <- if (intercept < 0){' '} else {' + '}
 
-if(typeof(bf)=='character'){
+if(typeof(bayes_factor)=='character'){
   #error in bayes factor calculation should return bf <- '-'
-  byfct <- bf
+  byfct <- bayes_factor
 }
 else{
-  byfct <- as.data.frame(bf)[1,'bf']
+  byfct <- as.data.frame(bayes_factor)[1,'bf']
   byfct <- round(byfct,3)
 }
 
