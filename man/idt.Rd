@@ -25,4 +25,3 @@ idt_results <- idt(idt_data$scones ~ idt_data$tea, tails = 1)
 idt_results <- idt(scones ~ tea, idt_data)
 idt_results <- idt(idt_data$scones_black, idt_data$scones_green, tails = 1)
 }
-

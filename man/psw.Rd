@@ -27,4 +27,3 @@ psw_results <- psw(pst_data$black_tea, pst_data$green_tea, tails = 1)
 psw_results <- psw(pst_data$black_tea, pst_data$green_tea, tails = 2)
 psw_results <- psw(scones ~ tea, pst_data_tall, tails = 1)
 }
-

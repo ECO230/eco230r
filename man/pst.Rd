@@ -27,4 +27,3 @@ pst_results <- pst(pst_data$black_tea, pst_data$green_tea, tails = 1)
 pst_results <- pst(pst_data$black_tea, pst_data$green_tea, tails = 2)
 pst_results <- pst(scones ~ tea, pst_data_tall, tails = 1)
 }
-

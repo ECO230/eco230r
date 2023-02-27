@@ -23,4 +23,3 @@ This function will generate the output for an Wilcoxon rank-sum test for indepen
 idw_results <- idt_data \%>\% idt(scones ~ tea)
 idt_results <- idt(scones ~ tea, idt_data, tails = 1)
 }
-

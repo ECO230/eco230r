@@ -25,4 +25,3 @@ ano_results <- ano(sleeptime ~ light, ano_data)
 ano_results <- ano(sleeptime ~ light, ano_data)
 ano_results <- ano(ano_data$sleeptime ~ ano_data$light)
 }
-

@@ -22,4 +22,3 @@ x2_results <- x2_data \%>\% csi(class_rank ~ gender)
 x2_results <- csi(class_rank ~ gender, x2_data)
 x2_results <- csi(x2_data$class_rank, x2_data$gender)
 }
-

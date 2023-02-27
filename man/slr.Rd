@@ -22,4 +22,3 @@ slr_results <- sales_data \%>\% slr(sales ~ adverts)
 slr_results <- slr(sales ~ adverts, sales_data)
 slr_results < slr(sales_data$sales ~ sales_data$adverts)
 }
-
