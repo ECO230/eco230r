@@ -37,7 +37,7 @@ slr <- function(x, y = NULL) {
 
   tryCatch({
     bf <- '--'
-    bf <- regressionBF(formula = formula, data = data)
+    bf <- BayesFactor::regressionBF(formula = formula, data = data)
   },error=function(e) {
     print(e)
   }

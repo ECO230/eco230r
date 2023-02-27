@@ -58,7 +58,7 @@ csi <- function(x,y=NULL,z=NULL) {
 
   tryCatch({
     bf <- '--'
-    bf <- contingencyTableBF(mod$observed, sampleType = "indepMulti", fixedMargin = "cols")
+    bf <- BayesFactor::contingencyTableBF(mod$observed, sampleType = "indepMulti", fixedMargin = "cols")
   },error=function(e) {
     print(e)
   }

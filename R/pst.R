@@ -53,7 +53,7 @@ pst <- function(x, y = NULL, z = NULL, tails = 2) {
 
   tryCatch({
     bf <- '--'
-    bf <- ttestBF(mf_x,mf_y,paired=TRUE)
+    bf <- BayesFactor::ttestBF(mf_x,mf_y,paired=TRUE)
   },error=function(e) {
     print(e)
   }

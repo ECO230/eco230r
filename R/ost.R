@@ -39,7 +39,7 @@ ost <- function(x, y = NULL, tails = 2, mu = 0.0) {
 
     tryCatch({
       bf <- '--'
-      bf <- ttestBF(nf[,1],nf[,2],paired=TRUE)
+      bf <- BayesFactor::ttestBF(nf[,1],nf[,2],paired=TRUE)
     },error=function(e) {
       print(e)
     }
@@ -52,7 +52,7 @@ ost <- function(x, y = NULL, tails = 2, mu = 0.0) {
 
     tryCatch({
       bf <- '--'
-      bf <- ttestBF(nf[,1],nf[,2],paired=TRUE)
+      bf <- BayesFactor::ttestBF(nf[,1],nf[,2],paired=TRUE)
     },error=function(e) {
       print(e)
     }
