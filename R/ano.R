@@ -70,7 +70,7 @@ ano <- function(x, y = NULL, tr = .1) {
     ph$P.Value <- signif(ph$P.Value,3)
     tryCatch({
       bf <- '--'
-      bf <- BayesFactor::anovaBF(mf)
+      bf <- BayesFactor::anovaBF(formula,mf)
     },error=function(e) {
       print(e)
     }
