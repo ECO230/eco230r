@@ -32,12 +32,15 @@ slr <- function(x, y = NULL) {
     mf <- model.frame(formula)
   }
 
+  #remove any infinite numbers any remaining nans
+  mf <- mf[is.finite(rowSums(mf)),]
+
   #Build Model
-  mod <- lm(formula = formula, data = data, na.action = na.exclude)
+  mod <- lm(formula = formula, data = mf, na.action = na.exclude)
 
   tryCatch({
     bf <- '--'
-    bf <- BayesFactor::regressionBF(formula = formula, data = data)
+    bf <- BayesFactor::regressionBF(formula = formula, data = mf)
   },error=function(e) {
     print(e)
   }

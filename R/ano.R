@@ -40,7 +40,14 @@ ano <- function(x, y = NULL, tr = .1) {
       tr < 0 || tr > 1))
     stop("'tr' must be a single number between 0 and 1")
 
-  levene <- (invisible(car::leveneTest(formula, data = data)))
+  #convert independent variable to a factor
+  if(!(is.factor(mf[[2]])))
+  {
+  mf[[2]] <- as.factor(mf[[2]])
+  print('Independent variable converted to a factor using as.factor()')
+  }
+
+  levene <- (invisible(car::leveneTest(formula, data = mf)))
   levene_p <- levene$`Pr(>F)`[1]
 
 
