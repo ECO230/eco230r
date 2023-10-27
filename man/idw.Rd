@@ -20,6 +20,8 @@ A list of output for reporting $analysis_type, $results, $descriptive_statistics
 This function will generate the output for an Wilcoxon rank-sum test for independent non-parametric samples
 }
 \examples{
-idw_results <- idt_data \%>\% idt(scones ~ tea)
-idt_results <- idt(scones ~ tea, idt_data, tails = 1)
+idw_results <- idw_data \%>\% idw(scones ~ tea)
+idw_results <- idw(scones ~ tea, idw_data, tails = 1)
+idw_results <- idw(idw_data, scones ~ tea)
+idw_results <- idw(idw_data$scones ~ idw_data$tea)
 }

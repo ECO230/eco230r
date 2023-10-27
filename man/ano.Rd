@@ -22,6 +22,6 @@ This function will generate output for Analysis of Variance. Homogeneity of Vari
 \examples{
 ano_results <- ano_data \%>\% ano(sleeptime ~ light)
 ano_results <- ano(sleeptime ~ light, ano_data)
-ano_results <- ano(sleeptime ~ light, ano_data)
+ano_results <- ano(ano_data, sleeptime ~ light)
 ano_results <- ano(ano_data$sleeptime ~ ano_data$light)
 }

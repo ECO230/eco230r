@@ -11,7 +11,7 @@
 #'
 #' @examples ano_results <- ano_data %>% ano(sleeptime ~ light)
 #' ano_results <- ano(sleeptime ~ light, ano_data)
-#' ano_results <- ano(sleeptime ~ light, ano_data)
+#' ano_results <- ano(ano_data, sleeptime ~ light)
 #' ano_results <- ano(ano_data$sleeptime ~ ano_data$light)
 ano <- function(x, y = NULL, tr = .1) {
 
@@ -32,6 +32,11 @@ ano <- function(x, y = NULL, tr = .1) {
   else if (fn) {
     formula = x
     mf <- model.frame(formula)
+    colnames(mf) <- sapply(strsplit(colnames(mf),"\\$"),tail,1) #rename by splitting $ if present
+    formula <- eval(parse(text=paste0(colnames(mf)[[1]],'~',colnames(mf)[[2]])))
+    data <- mf
+    mf <- model.frame(formula,data)
+
   }
 
 
@@ -46,6 +51,18 @@ ano <- function(x, y = NULL, tr = .1) {
   mf[[2]] <- as.factor(mf[[2]])
   print('Independent variable converted to a factor using as.factor()')
   }
+
+  raw_rows = nrow(data)
+
+  #remove any infinite numbers any remaining nans
+  mf <- mf[complete.cases(mf),]
+
+  model_rows = nrow(mf)
+
+  diff_rows = raw_rows - model_rows
+
+  if(diff_rows > 0)
+  {print(paste(as.character(diff_rows),'rows removed due to NA/Nan/Inf values in data.'))}
 
   levene <- (invisible(car::leveneTest(formula, data = mf)))
   levene_p <- levene$`Pr(>F)`[1]

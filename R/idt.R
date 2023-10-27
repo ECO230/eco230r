@@ -12,26 +12,57 @@
 #' @examples idt_results <- idt_data %>% idt(scones ~ tea)
 #' idt_results <- idt(idt_data$scones ~ idt_data$tea, tails = 1)
 #' idt_results <- idt(scones ~ tea, idt_data)
-#' idt_results <- idt(idt_data$scones_black, idt_data$scones_green, tails = 1)
+#' idt_results <- idt(idt_data, scones ~ tea)
 idt <- function(x, y = NULL, tails = 2) {
   fd <- is.formula(x) * is.data.frame(y)
   df <- is.data.frame(x) * is.formula(y)
+  fn <- is.formula(x) * missing(y)
 
   if (df) {
-    m_x = y
-    m_y = x
+    formula = y
+    data = x
+    mf <- model.frame(formula,data)
   }
   else if (fd) {
-    m_x = x
-    m_y = y
+    formula = x
+    data = y
+    mf <- model.frame(formula,data)
+  }
+  else if (fn) {
+    formula = x
+    mf <- model.frame(formula)
+    colnames(mf) <- sapply(strsplit(colnames(mf),"\\$"),tail,1) #rename by splitting $ if present
+    formula <- eval(parse(text=paste0(colnames(mf)[[1]],'~',colnames(mf)[[2]])))
+    data <- mf
+    mf <- model.frame(formula,data)
+
   }
 
+  raw_rows = nrow(data)
+
+  #convert independent variable to a factor
+  if(!(is.factor(mf[[2]])))
+  {
+    mf[[2]] <- as.factor(mf[[2]])
+    print('Independent variable converted to a factor using as.factor()')
+  }
+
+  #remove any infinite numbers any remaining nans
+  mf <- mf[complete.cases(mf),]
+
+  model_rows = nrow(mf)
+
+  diff_rows = raw_rows - model_rows
+
+  if(diff_rows > 0)
+  {print(paste(as.character(diff_rows),'rows removed due to NA/Nan/Inf values in data.'))}
+
   #build model
-  mod <- t.test(m_x, m_y, paired = FALSE)
+  mod <- t.test(formula = formula, data = mf, paired = FALSE)
 
   tryCatch({
     bf <- '--'
-    bf <- BayesFactor::ttestBF(formula = m_x, data = m_y)
+    bf <- BayesFactor::ttestBF(formula = formula, data = mf)
   },error=function(e) {
     print(e)
   }
@@ -45,6 +76,6 @@ idt <- function(x, y = NULL, tails = 2) {
 
   #descriptives
   res_list <- report_t(mod, tails = tails, an, bayes_factor=bf)
-  dsc <- desc_e(m_x, m_y, 'idt',deparse(substitute(m_x)),deparse(substitute(m_y)))
+  dsc <- desc_e(formula, mf, 'idt',deparse(substitute(formula)),deparse(substitute(mf)))
   list('analysis_type' = res_list[[1]], 'results' = res_list[[2]], 'descriptive_statistics' = dsc)
 }

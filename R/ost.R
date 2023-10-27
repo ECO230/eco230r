@@ -10,10 +10,13 @@
 #' @return A list of output for reporting $analysis_type, $results, $descriptive_statistics
 #' @export
 #'
-#' @examples ost_results <- idt_data %>% ost(~scones,mu = 44)
-#' ost_results <- ost(idt_data$scones, tails = 1, mu = 44)
-#' ost_results <- ost(idt_data$scones ~ 1, tails = 1, mu = 44)
-#' ost_results <- ost(scones ~ 1, idt_data, tails = 1, mu = 44)
+#' @examples ost_results <- ost_data %>% ost(~scones,mu = 44)
+#' ost_results <- ost(ost_data$scones, tails = 1, mu = 44)
+#' ost_results <- ost(ost_data$scones ~ 1, tails = 1, mu = 44)
+#' ost_results <- ost(scones ~ 1, ost_data, tails = 1, mu = 44)
+#' ost_results <- ost(~scones, ost_data, mu = 44)
+#' ost_results <- ost(ost_data, ~scones, mu = 44)
+#' ost_results <- ost(ost_data$scones, mu = 44)
 ost <- function(x, y = NULL, tails = 2, mu = 0.0) {
   fd <- is.formula(x) * is.data.frame(y)
   df <- is.data.frame(x) * is.formula(y)
@@ -22,43 +25,52 @@ ost <- function(x, y = NULL, tails = 2, mu = 0.0) {
 
   if (fd) {
     #formula in x data in y
-    mf <- model.frame(x,y)
+    data <- y
+    formula <- x
+    mf <- model.frame(formula,data)
     nf <- mf
     nf$mu = mu
   }
   else if (df) {
     #data in x formula in y
-    mf <- model.frame(y,x)
+    data <- x
+    formula <- y
+    mf <- model.frame(formula,data)
+    nf <- mf
+    nf$mu = mu
+  }
+  else if (vd|vn) {
+    nam <- sapply(strsplit(deparse(substitute(x)),"\\$"),tail,1) #Get name from x split $ if present
+    data <- data.frame(x)
+    colnames(data) <- nam
+    formula <- formula <- eval(parse(text=paste0('~',nam)))  #Build formula from name
+    mf <- model.frame(formula,data)
     nf <- mf
     nf$mu = mu
   }
 
+  raw_rows <- nrow(data)
+
+  #remove any infinite numbers any remaining nans
+  nf <- nf[complete.cases(nf),]
+
+  model_rows <- nrow(nf)
+
+  diff_rows <- raw_rows - model_rows
+
+  if(diff_rows > 0)
+  {print(paste(as.character(diff_rows),'rows removed due to NA/Nan/Inf values in data.'))}
+
   #build model
-  if (fd | df) {
-    mod <- t.test(mf, paired = FALSE, mu = mu)
+  mod <- t.test(nf[,1], paired = FALSE, mu = mu)
 
-    tryCatch({
-      bf <- '--'
-      bf <- BayesFactor::ttestBF(nf[,1],nf[,2],paired=TRUE)
-    },error=function(e) {
-      print(e)
-    }
-    )
-
-  } else if (vd | vn) {
-    mod <- t.test(x, paired = FALSE, mu = mu)
-    nf <- data.frame(x)
-    nf$mu = mu
-
-    tryCatch({
-      bf <- '--'
-      bf <- BayesFactor::ttestBF(nf[,1],nf[,2],paired=TRUE)
-    },error=function(e) {
-      print(e)
-    }
-    )
-
+  tryCatch({
+    bf <- '--'
+    bf <- BayesFactor::ttestBF(nf[,1],nf[,2],paired=TRUE)
+  },error=function(e) {
+    print(e)
   }
+  )
 
   if (tails == 2) {
     an <- 'One Sample t-Test, Two Tailed test'
@@ -68,18 +80,8 @@ ost <- function(x, y = NULL, tails = 2, mu = 0.0) {
 
   #descriptives
   res_list <- report_t(mod, tails = tails, an,bayes_factor = bf)
-  if (fd) {
-    dsc <-desc_e(x, y, 'ost', colnames(mf)[1],deparse(substitute(y)))
-  }
-  else if (df) {
-    dsc <-desc_e(y, x, 'ost', colnames(mf)[1],deparse(substitute(x)))
-  }
-  else if (vd){
-    dsc <- desc_e(x, NULL, 'ost',deparse(substitute(x)),'NULL')
-  }
-  else if (vn){
-    dsc <- desc_e(x, y, 'ost',deparse(substitute(x)),deparse(substitute(y)))
-  }
+
+  dsc <-desc_e(formula, nf[1], 'ost', colnames(nf)[1],deparse(substitute(y)))
 
   list('analysis_type' = res_list[[1]], 'results' = res_list[[2]], 'descriptive_statistics' = dsc)
 
