@@ -58,7 +58,7 @@ idw <- function(x, y = NULL, tails = 2) {
   {print(paste(as.character(diff_rows),'rows removed due to NA/Nan/Inf values in data.'))}
 
   #build model
-  mod <- wilcox.test(formula=formula, data=mf, paired = FALSE)
+  mod <- wilcox.test(formula=formula, data=mf)
 
   #tryCatch({
   #  bf <- '--'
