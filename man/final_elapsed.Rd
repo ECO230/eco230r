@@ -9,4 +9,3 @@ final_elapsed()
 \description{
 This function will tell how much time has passed since loading the file
 }
-

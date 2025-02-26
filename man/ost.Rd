@@ -22,9 +22,11 @@ A list of output for reporting $analysis_type, $results, $descriptive_statistics
 This function will generate the output for a one sample t test.
 }
 \examples{
-ost_results <- idt_data \%>\% ost(~scones,mu = 44)
-ost_results <- ost(idt_data$scones, tails = 1, mu = 44)
-ost_results <- ost(idt_data$scones ~ 1, tails = 1, mu = 44)
-ost_results <- ost(scones ~ 1, idt_data, tails = 1, mu = 44)
+ost_results <- ost_data \%>\% ost(~scones,mu = 44)
+ost_results <- ost(ost_data$scones, tails = 1, mu = 44)
+ost_results <- ost(ost_data$scones ~ 1, tails = 1, mu = 44)
+ost_results <- ost(scones ~ 1, ost_data, tails = 1, mu = 44)
+ost_results <- ost(~scones, ost_data, mu = 44)
+ost_results <- ost(ost_data, ~scones, mu = 44)
+ost_results <- ost(ost_data$scones, mu = 44)
 }
-

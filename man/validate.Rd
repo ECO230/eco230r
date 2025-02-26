@@ -18,4 +18,3 @@ This function is used during setup to validate that a student was able to instal
 \examples{
 validation <- validate(1234)
 }
-

@@ -11,7 +11,7 @@
 #'
 #' @examples ano_results <- ano_data %>% ano(sleeptime ~ light)
 #' ano_results <- ano(sleeptime ~ light, ano_data)
-#' ano_results <- ano(sleeptime ~ light, ano_data)
+#' ano_results <- ano(ano_data, sleeptime ~ light)
 #' ano_results <- ano(ano_data$sleeptime ~ ano_data$light)
 ano <- function(x, y = NULL, tr = .1) {
 
@@ -32,6 +32,11 @@ ano <- function(x, y = NULL, tr = .1) {
   else if (fn) {
     formula = x
     mf <- model.frame(formula)
+    colnames(mf) <- sapply(strsplit(colnames(mf),"\\$"),tail,1) #rename by splitting $ if present
+    formula <- eval(parse(text=paste0(colnames(mf)[[1]],'~',colnames(mf)[[2]])))
+    data <- mf
+    mf <- model.frame(formula,data)
+
   }
 
 
@@ -40,7 +45,26 @@ ano <- function(x, y = NULL, tr = .1) {
       tr < 0 || tr > 1))
     stop("'tr' must be a single number between 0 and 1")
 
-  levene <- (invisible(car::leveneTest(formula, data = data)))
+  #convert independent variable to a factor
+  if(!(is.factor(mf[[2]])))
+  {
+  mf[[2]] <- as.factor(mf[[2]])
+  print('Independent variable converted to a factor using as.factor()')
+  }
+
+  raw_rows = nrow(data)
+
+  #remove any infinite numbers any remaining nans
+  mf <- mf[complete.cases(mf),]
+
+  model_rows = nrow(mf)
+
+  diff_rows = raw_rows - model_rows
+
+  if(diff_rows > 0)
+  {print(paste(as.character(diff_rows),'rows removed due to NA/Nan/Inf values in data.'))}
+
+  levene <- (invisible(car::leveneTest(formula, data = mf)))
   levene_p <- levene$`Pr(>F)`[1]
 
 
@@ -68,7 +92,13 @@ ano <- function(x, y = NULL, tr = .1) {
     ph <- pd[,c('psihat','p.value')]
     colnames(ph) <- c('Difference','P.Value')
     ph$P.Value <- signif(ph$P.Value,3)
-
+    tryCatch({
+      bf <- '--'
+      bf <- BayesFactor::anovaBF(formula,mf)
+    },error=function(e) {
+      print(e)
+    }
+    )
 
   } else {
     aov <- aov(mf)
@@ -90,8 +120,25 @@ ano <- function(x, y = NULL, tr = .1) {
     ph <- ph[,c('diff','p.adj')]
     colnames(ph) <- c('Difference','P.Value')
     ph$P.Value <- signif(ph$P.Value,3)
+    tryCatch({
+      bf <- '--'
+      bf <- BayesFactor::anovaBF(formula,mf)
+    },error=function(e) {
+      print(e)
+    }
+    )
   }
-  res <- paste(c('F(', round(Dfm,2), ',', round(Dfr,2), ') = ', round(Fv,3),', p = ', round(p,3),', w = ',round(w,3)), collapse = '')
+
+  if(typeof(bf)=='character'){
+    #error in bayes factor calculation should return bf <- '-'
+    byfct <- bf
+    }
+  else{
+    byfct <- as.data.frame(bf)[1,'bf']
+    byfct <- round(byfct,3)
+  }
+
+  res <- paste(c('F(', round(Dfm,2), ',', round(Dfr,2), ') = ', round(Fv,3),', p = ', round(p,3),', w = ',round(w,3),', bf10 = ',byfct), collapse = '')
   dsc <- desc_e(x = formula, y = data, 'ano',deparse(substitute(formula)),deparse(substitute(data)))
   list('analysis_type' = an,'results' = res,'descriptive_statistics' = dsc,'post_hoc_analysis' = ph)
 }

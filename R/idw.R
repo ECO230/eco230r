@@ -9,30 +9,81 @@
 #' @return A list of output for reporting $analysis_type, $results, $descriptive_statistics
 #' @export
 #'
-#' @examples idw_results <- idt_data %>% idt(scones ~ tea)
-#' idt_results <- idt(scones ~ tea, idt_data, tails = 1)
+#' @examples idw_results <- idw_data %>% idw(scones ~ tea)
+#' idw_results <- idw(scones ~ tea, idw_data, tails = 1)
+#' idw_results <- idw(idw_data, scones ~ tea)
+#' idw_results <- idw(idw_data$scones ~ idw_data$tea)
 idw <- function(x, y = NULL, tails = 2) {
   fd <- is.formula(x) * is.data.frame(y)
   df <- is.data.frame(x) * is.formula(y)
+  fn <- is.formula(x) * missing(y)
 
   if (df) {
-    m_x = y
-    m_y = x
-    mf <- model.frame(y,x)
+    formula = y #m_x
+    data = x #m_y
+    mf <- model.frame(formula,data)
   }
   else if (fd) {
-    m_x = x
-    m_y = y
-    mf <- model.frame(x.y)
+    formula = x #m_x
+    data = y #m_y
+    mf <- model.frame(formula,data)
+  }
+  else if (fn) {
+    formula = x
+    mf <- model.frame(formula)
+    colnames(mf) <- sapply(strsplit(colnames(mf),"\\$"),tail,1) #rename by splitting $ if present
+    formula <- eval(parse(text=paste0(colnames(mf)[[1]],'~',colnames(mf)[[2]])))
+    data <- mf
+    mf <- model.frame(formula,data)
+
   }
 
+  raw_rows = nrow(data)
+
+  #convert independent variable to a factor
+  if(!(is.factor(mf[[2]])))
+  {
+    mf[[2]] <- as.factor(mf[[2]])
+    print('Independent variable converted to a factor using as.factor()')
+  }
+
+  #remove any infinite numbers any remaining nans
+  mf <- mf[complete.cases(mf),]
+
+  model_rows = nrow(mf)
+
+  diff_rows = raw_rows - model_rows
+
+  if(diff_rows > 0)
+  {print(paste(as.character(diff_rows),'rows removed due to NA/Nan/Inf values in data.'))}
+
   #build model
-  mod <- wilcox.test(m_x, m_y, paired = FALSE)
+  mod <- wilcox.test(formula=formula, data=mf)
+
+  #tryCatch({
+  #  bf <- '--'
+  #  library(bayesWilcoxTest)
+  #  bf <- bayes.wilcox.test(formula=formula, data=mf, paired = FALSE)
+  #},error=function(e) {
+  #  print(e)
+  #}
+  #)
+
+
   if (tails ==2) {
     an <- 'Wilcoxon Rank-Sum Test (Independent Samples), Two Tailed test'
   } else {
     an <- 'Wilcoxon Rank-Sum Test (Independent Samples), One Tailed test'
   }
+
+  #if(typeof(bf)=='character'){
+  #  #error in bayes factor calculation should return bf <- '-'
+  #  byfct <- bf
+  #}
+  #else{
+  #  byfct <- summary(bf)[7]
+  #  byfct <- round(byfct,3)
+  #}
 
   W <- mod$statistic
   p <- mod$p.value

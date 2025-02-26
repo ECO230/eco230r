@@ -22,9 +22,10 @@ A list of output for reporting $analysis_type, $results, $descriptive_statistics
 This function will generate the output for a Wilcoxon Signed-Rank Test for non-parametric paired samples
 }
 \examples{
-psw_results <- pst_data \%>\% psw(~scones,~tea)
-psw_results <- psw(pst_data$black_tea, pst_data$green_tea, tails = 1)
-psw_results <- psw(pst_data$black_tea, pst_data$green_tea, tails = 2)
-psw_results <- psw(scones ~ tea, pst_data_tall, tails = 1)
+psw_results <- psw_data \%>\% psw(~scones,~tea)
+psw_results <- psw(psw_data$black_tea, psw_data$green_tea, tails = 1)
+psw_results <- psw(psw_data, ~scones, ~tea)
+psw_results <- psw(~scones, ~tea, psw_data)
+psw_results <- psw(psw_data$black_tea, psw_data$green_tea)
+psw_results <- psw(scones ~ tea, psw_data_tall)
 }
-

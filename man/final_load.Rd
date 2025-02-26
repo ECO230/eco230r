@@ -9,4 +9,3 @@ final_load()
 \description{
 This function will load the data for this section's final exam
 }
-

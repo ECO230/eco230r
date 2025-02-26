@@ -10,6 +10,7 @@
 #'
 #' @examples slr_results <- sales_data %>% slr(sales ~ adverts)
 #' slr_results <- slr(sales ~ adverts, sales_data)
+#' slr_results <- slr(sales_data, sales ~ adverts)
 #' slr_results < slr(sales_data$sales ~ sales_data$adverts)
 slr <- function(x, y = NULL) {
 
@@ -30,12 +31,37 @@ slr <- function(x, y = NULL) {
   else if (fn) {
     formula = x
     mf <- model.frame(formula)
+    colnames(mf) <- sapply(strsplit(colnames(mf),"\\$"),tail,1) #rename by splitting $ if present
+    formula <- eval(parse(text=paste0(colnames(mf)[[1]],'~',colnames(mf)[[2]])))
+    data <- mf
+    mf <- model.frame(formula,data)
+
   }
 
+  raw_rows = nrow(data)
+
+  #remove any infinite numbers any remaining nans
+  mf <- mf[is.finite(rowSums(mf)),]
+
+  model_rows = nrow(mf)
+
+  diff_rows = raw_rows - model_rows
+
+  if(diff_rows > 0)
+  {print(paste(as.character(diff_rows),'rows removed due to NA/Nan/Inf values in data.'))}
+
   #Build Model
-  mod <- lm(formula = formula, data = data, na.action = na.exclude)
+  mod <- lm(formula = formula, data = mf, na.action = na.exclude)
+
+  tryCatch({
+    bf <- '--'
+    bf <- BayesFactor::regressionBF(formula = formula, data = mf)
+  },error=function(e) {
+    print(e)
+  }
+  )
 
   #descriptives
-  res_list <- report_lm(mod,deparse(formula))
+  res_list <- report_lm(mod,deparse(formula),bayes_factor=bf)
   res_list
 }

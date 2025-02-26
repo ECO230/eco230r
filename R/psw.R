@@ -10,10 +10,12 @@
 #' @return A list of output for reporting $analysis_type, $results, $descriptive_statistics
 #' @export
 #'
-#' @examples psw_results <- pst_data %>% psw(~scones,~tea)
-#' psw_results <- psw(pst_data$black_tea, pst_data$green_tea, tails = 1)
-#' psw_results <- psw(pst_data$black_tea, pst_data$green_tea, tails = 2)
-#' psw_results <- psw(scones ~ tea, pst_data_tall, tails = 1)
+#' @examples psw_results <- psw_data %>% psw(~scones,~tea)
+#' psw_results <- psw(psw_data$black_tea, psw_data$green_tea, tails = 1)
+#' psw_results <- psw(psw_data, ~scones, ~tea)
+#' psw_results <- psw(~scones, ~tea, psw_data)
+#' psw_results <- psw(psw_data$black_tea, psw_data$green_tea)
+#' psw_results <- psw(scones ~ tea, psw_data_tall)
 psw <- function(x, y = NULL, z = NULL, tails = 2) {
 
   fdn <- is.formula(x) * is.data.frame(y) * missing(z)
@@ -25,36 +27,72 @@ psw <- function(x, y = NULL, z = NULL, tails = 2) {
 
   if (fdn) {
     #formula in x data in y
-    mf <- model.frame(x,y)
+    mf <- model.frame(x,y,na.action=NULL)
     mf_x <- mf[[1]]
     mf_y <- mf[[2]]
   }
   else if (dfn) {
     #data in x formula in y
-    mf <- model.frame(y,x)
+    mf <- model.frame(y,x,na.action=NULL)
     mf_x <- mf[[1]]
     mf_y <- mf[[2]]
   }
   else if (ffd) {
-    mf_x <- model.frame(x,z)[[1]]
-    mf_y <- model.frame(y,z)[[1]]
+    mf_x <- model.frame(x,z,na.action=NULL)[[1]]
+    mf_y <- model.frame(y,z,na.action=NULL)[[1]]
   }
   else if (dff) {
-    mf_x <- model.frame(y,x)[[1]]
-    mf_y <- model.frame(z,x)[[1]]
+    mf_x <- model.frame(y,x,na.action=NULL)[[1]]
+    mf_y <- model.frame(z,x,na.action=NULL)[[1]]
   }
   else if (vvn | vvd) {
     mf_x <- x
     mf_y <- y
   }
 
+  djoin <- data.frame(mf_x,mf_y)
+
+  raw_rows = nrow(djoin)
+
+  #remove any infinite numbers any remaining nans
+  djoin <- djoin[complete.cases(djoin),]
+
+  model_rows = nrow(djoin)
+
+  diff_rows = raw_rows - model_rows
+
+  if(diff_rows > 0)
+  {print(paste(as.character(diff_rows),' non-matching rows removed due to NA/Nan/Inf values in data.'))}
+
+  mf_x <- djoin[[1]]
+  mf_y <- djoin[[2]]
+
   #build model
   mod <- wilcox.test(mf_x, mf_y,paired=TRUE,correct=FALSE)
+
+#  tryCatch({
+#    bf <- '--'
+#    library(bayesWilcoxTest)
+#    bf <- bayes.wilcox.test(f_x, mf_y,paired=TRUE,correct=FALSE)
+#  },error=function(e) {
+#    print(e)
+#  }
+#  )
+
   if (tails ==2) {
     an <- 'Wilcoxon Signed-Rank Test (Paired Samples), Two Tailed test'
   } else {
     an <- 'Wilcoxon Signed-Rank Test (Paired Samples), One Tailed test'
   }
+
+  #if(typeof(bf)=='character'){
+  #  #error in bayes factor calculation should return bf <- '-'
+  #  byfct <- bf
+  #}
+  #else{
+  #  byfct <- summary(bf)[7]
+  #  byfct <- round(byfct,3)
+  #}
 
 
   V <- mod$statistic
@@ -80,8 +118,8 @@ psw <- function(x, y = NULL, z = NULL, tails = 2) {
     y_name <- names(model.frame(z,x))[1]
   }
   else if (vvn | vvd) {
-    x_name <- deparse(substitute(x))
-    y_name <- deparse(substitute(y))
+    x_name <- sapply(strsplit(deparse(substitute(x)),"\\$"),tail,1) #Split by $ if present return tail
+    y_name <- sapply(strsplit(deparse(substitute(y)),"\\$"),tail,1) #Split by $ if present return tail
   }
 
   dsc1 <- data.frame(length(mf_x),median(mf_x))

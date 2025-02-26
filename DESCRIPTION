@@ -11,5 +11,6 @@ Encoding: UTF-8
 LazyData: true
 Imports:
     car,
-    WRS2
-RoxygenNote: 5.0.1
+    WRS2,
+    BayesFactor
+RoxygenNote: 7.2.3

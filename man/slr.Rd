@@ -20,6 +20,6 @@ This function performs a simple linear regression and returns reporting informat
 \examples{
 slr_results <- sales_data \%>\% slr(sales ~ adverts)
 slr_results <- slr(sales ~ adverts, sales_data)
+slr_results <- slr(sales_data, sales ~ adverts)
 slr_results < slr(sales_data$sales ~ sales_data$adverts)
 }
-

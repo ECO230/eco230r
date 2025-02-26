@@ -9,4 +9,3 @@ final_user()
 \description{
 This function will tell if there are login issues
 }
-
