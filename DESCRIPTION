@@ -12,5 +12,6 @@ LazyData: true
 Imports:
     car,
     WRS2,
-    BayesFactor
-RoxygenNote: 7.2.3
+    BayesFactor,
+    forcats
+RoxygenNote: 7.3.2

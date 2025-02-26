@@ -4,7 +4,7 @@
 \alias{ano}
 \title{Generate output for ANOVA}
 \usage{
-ano(x, y = NULL, tr = 0.1)
+ano(x, y = NULL, tr = 0.1, min_n = 5, max_cat = 10)
 }
 \arguments{
 \item{x}{A formula dependent variable ~ dependent variable.}
@@ -12,6 +12,10 @@ ano(x, y = NULL, tr = 0.1)
 \item{y}{Optional A data frame, necessary if data frame is not referenced in formula or piped in.}
 
 \item{tr}{Optional, a double indicating percentage of means to trim for robust ANOVA, default value is 0.1}
+
+\item{min_n}{Optional, an int indicating minimum group size, anything smaller will be folded into an Other category, default value is 5}
+
+\item{max_cat}{Optional, an int indicating maximum number of categories additional categories will be folded into an Other category, default value is 10}
 }
 \value{
 A list of output for reporting $analysis_type, $results, $descriptive_statistics, $post_hoc_analysis
