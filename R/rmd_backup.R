@@ -9,6 +9,7 @@ rmd_backup <- function(search = 'Group*') {
 
   #Create dir if it doesn't exist
   dir.create(file.path('Prompt', 'rmd_backups'),showWarnings = FALSE)
+  pth_del = ''
 
   ff <- data.frame(id = numeric()
                    ,path = character()
@@ -51,7 +52,6 @@ rmd_backup <- function(search = 'Group*') {
         slice(1:1) %>%
         select(path)
     }
-
 
 
     #write new file current version of these files
