@@ -23,7 +23,7 @@ rmd_backup <- function(search = 'Group*') {
   for (x in list.files('Prompt/rmd_backups', full.names = TRUE, pattern = '*.Rmd')) {
     print(x)
     stem <- sub(pattern = "(.*)\\..*$", replacement = "\\1", basename(x))
-    st_sp <- str_split(stem, "_")
+    st_sp <- stringr::str_split(stem, "_")
     dt_cd <- st_sp[[1]][length(st_sp[[1]])]
     stem_nd <- paste(st_sp[[1]][0:(length(st_sp[[1]])-1)],collapse='_')
     hash <- rlang::hash_file(x)
