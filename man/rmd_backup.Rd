@@ -4,10 +4,10 @@
 \alias{rmd_backup}
 \title{Backup all .Rmd files matching a pattern, if there is an exact copy already existing, with same hash, replace the most recent backup with this one timestamp is added as a suffix to the file name.}
 \usage{
-rmd_backup(search = "Group*")
+rmd_backup(search = "*")
 }
 \arguments{
-\item{search}{File name to search for default is Group*, for a specific file only pass in file name with no file type e.g. Group_Analysis_Plan}
+\item{search}{File name to search for default is * or any .Rmd file in the project folder, for a specific file only pass in file name with no file type e.g. Group_Analysis_Plan}
 }
 \description{
 Backup all .Rmd files matching a pattern, if there is an exact copy already existing, with same hash, replace the most recent backup with this one timestamp is added as a suffix to the file name.

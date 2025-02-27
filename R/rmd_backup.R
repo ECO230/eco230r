@@ -1,10 +1,10 @@
 #' Backup all .Rmd files matching a pattern, if there is an exact copy already existing, with same hash, replace the most recent backup with this one timestamp is added as a suffix to the file name.
 #'
-#' @param search File name to search for default is Group*, for a specific file only pass in file name with no file type e.g. Group_Analysis_Plan
+#' @param search File name to search for default is * or any .Rmd file in the project folder, for a specific file only pass in file name with no file type e.g. Group_Analysis_Plan
 #'
 #' @export
 #'
-rmd_backup <- function(search = 'Group*') {
+rmd_backup <- function(search = '*') {
   search_pth <- paste(search,'.Rmd',sep = '')
 
   #Create dir if it doesn't exist
@@ -21,7 +21,6 @@ rmd_backup <- function(search = 'Group*') {
 
   #get list of current files in directory with hashes
   for (x in list.files('Prompt/rmd_backups', full.names = TRUE, pattern = '*.Rmd')) {
-    print(x)
     stem <- sub(pattern = "(.*)\\..*$", replacement = "\\1", basename(x))
     st_sp <- stringr::str_split(stem, "_")
     dt_cd <- st_sp[[1]][length(st_sp[[1]])]
