@@ -10,12 +10,12 @@
 #' @return A list of output for reporting $analysis_type, $results, $descriptive_statistics
 #' @export
 #'
-#' @examples psw_results <- psw_data %>% psw(~scones,~tea)
-#' psw_results <- psw(psw_data$black_tea, psw_data$green_tea, tails = 1)
-#' psw_results <- psw(psw_data, ~scones, ~tea)
-#' psw_results <- psw(~scones, ~tea, psw_data)
-#' psw_results <- psw(psw_data$black_tea, psw_data$green_tea)
-#' psw_results <- psw(scones ~ tea, psw_data_tall)
+#' @examples psw_results <- t_wide %>% psw(~black_tea,~green_tea)
+#' psw_results <- psw(t_wide$black_tea, t_wide$green_tea, tails = 1)
+#' psw_results <- psw(t_wide, ~black_tea, ~green_tea)
+#' psw_results <- psw(~black_tea, ~green_tea, t_wide)
+#' psw_results <- psw(t_wide$black_tea, t_wide$green_tea)
+#' psw_results <- psw(black_tea ~ green_tea, t_wide)
 psw <- function(x, y = NULL, z = NULL, tails = 2) {
 
   fdn <- is.formula(x) * is.data.frame(y) * missing(z)
@@ -70,13 +70,7 @@ psw <- function(x, y = NULL, z = NULL, tails = 2) {
   #build model
   mod <- wilcox.test(mf_x, mf_y,paired=TRUE,correct=FALSE)
 
-  tryCatch({
-    bf <- '--'
-    bf <- DFBA::dfba_wilcoxon(mf_x,mf_y,samples=10000)
-  },error=function(e) {
-    print(e)
-  }
-  )
+
 
   if (tails ==2) {
     an <- 'Wilcoxon Signed-Rank Test (Paired Samples), Two Tailed test'
@@ -84,23 +78,54 @@ psw <- function(x, y = NULL, z = NULL, tails = 2) {
     an <- 'Wilcoxon Signed-Rank Test (Paired Samples), One Tailed test'
   }
 
-  if(typeof(bf)=='character'){
-    #error in bayes factor calculation should return bf <- '-'
-    byfct <- bf
-  }
-  else{
-    byfct <- bf$BF10
-    byfct <- round(byfct,3)
+  # difference scores for paired nonparametric effect size
+  diff_scores <- mf_x - mf_y
+  diff_scores_nz <- diff_scores[diff_scores != 0]
+
+  # matched-pairs rank-biserial correlation
+  rb <- NA_real_
+
+  tryCatch({
+    rb <- effectsize::rank_biserial(mf_x, mf_y, paired = TRUE)$r_rank_biserial
+  }, error = function(e) {
+    message("Rank-biserial correlation could not be computed: ", e$message)
+  })
+
+  # approximate BF10 using paired t-test
+  bf10 <- NA_real_
+  tryCatch({
+    bf_obj <- BayesFactor::ttestBF(x = mf_x, y = mf_y, paired = TRUE)
+    bf10 <- BayesFactor::extractBF(bf_obj)$bf[1]
+  }, error = function(e) {
+    message("Approximate Bayes factor could not be computed: ", e$message)
+  })
+
+  V <- as.numeric(mod$statistic)
+  p_raw <- mod$p.value
+  N <- length(diff_scores_nz)
+
+  z_stat <- abs(qnorm(p_raw / 2))
+  r <- z_stat / sqrt(N)
+
+  if (N > 0) {
+    z_stat <- abs(qnorm(p_raw / 2))
+    r <- z_stat / sqrt(N)
   }
 
+  p <- p_raw
+  if (tails == 1) {
+    p <- p_raw / 2
+  }
 
-  V <- mod$statistic
-  p <- mod$p.value
-  N <- length(mf_x)
-  Z <- abs(qnorm(p/2))
-  r <- Z/sqrt(N)
-  if (tails == 1) {p <- p/2}
-  res <- paste(c('p = ', round(p,3),', r = ',round(r,3),', bf10 = ',byfct), collapse = '')
+  p_txt <- format_p(p)
+  bf_txt <- format_bf(bf10)
+
+  res <- paste0(
+    "V = ", round(V, 3),
+    ", ", p_txt,
+    ", r_rb = ", round(rb, 3),
+    ", bf10 \u2248 ", bf_txt
+  )
 
   #descriptives
 

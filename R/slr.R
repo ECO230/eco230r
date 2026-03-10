@@ -8,60 +8,69 @@
 #' @return A list of output for reporting $analysis_type, $results, $linear_regression_model, $predictors, $coefficients
 #' @export
 #'
-#' @examples slr_results <- sales_data %>% slr(sales ~ adverts)
-#' slr_results <- slr(sales ~ adverts, sales_data)
-#' slr_results <- slr(sales_data, sales ~ adverts)
-#' slr_results < slr(sales_data$sales ~ sales_data$adverts)
+#' @examples slr_results <- napData %>% slr(naptime ~ timestamp)
+#' slr_results <- slr(naptime ~ timestamp, napData)
+#' slr_results <- slr(napData, naptime ~ timestamp)
+#' slr_results <- slr(napData$naptime ~ napData$timestamp)
 slr <- function(x, y = NULL) {
-
-  fd <- is.formula(x) * is.data.frame(y)
-  df <- is.data.frame(x) * is.formula(y)
-  fn <- is.formula(x) * missing(y)
+  fd <- is.formula(x) && is.data.frame(y)
+  df <- is.data.frame(x) && is.formula(y)
+  fn <- is.formula(x) && missing(y)
 
   if (fd) {
     formula <- x
     data <- y
-    mf <- model.frame(formula,data)
-  }
-  else if (df) {
+    mf <- stats::model.frame(formula, data)
+  } else if (df) {
     formula <- y
     data <- x
-    mf <- model.frame(formula,data)
-  }
-  else if (fn) {
-    formula = x
-    mf <- model.frame(formula)
-    colnames(mf) <- sapply(strsplit(colnames(mf),"\\$"),tail,1) #rename by splitting $ if present
-    formula <- eval(parse(text=paste0(colnames(mf)[[1]],'~',colnames(mf)[[2]])))
+    mf <- stats::model.frame(formula, data)
+  } else if (fn) {
+    formula <- x
+    mf <- stats::model.frame(formula)
+    colnames(mf) <- sapply(strsplit(colnames(mf), "\\$"), utils::tail, 1)
+    formula <- eval(parse(text = paste0(colnames(mf)[[1]], "~", colnames(mf)[[2]])))
     data <- mf
-    mf <- model.frame(formula,data)
-
+    mf <- stats::model.frame(formula, data)
+  } else {
+    stop(
+      "Unsupported input. Use slr(formula, data), slr(data, formula), or slr(y ~ x).",
+      call. = FALSE
+    )
   }
 
-  raw_rows = nrow(data)
+  raw_rows <- nrow(data)
 
-  #remove any infinite numbers any remaining nans
-  mf <- mf[is.finite(rowSums(mf)),]
+  keep <- stats::complete.cases(mf)
+  for (j in seq_along(mf)) {
+    if (is.numeric(mf[[j]])) {
+      keep <- keep & is.finite(mf[[j]])
+    }
+  }
 
-  model_rows = nrow(mf)
+  mf <- mf[keep, , drop = FALSE]
 
-  diff_rows = raw_rows - model_rows
+  if (ncol(mf) != 2) {
+    stop("slr() requires exactly one dependent variable and one independent variable.")
+  }
 
-  if(diff_rows > 0)
-  {print(paste(as.character(diff_rows),'rows removed due to NA/Nan/Inf values in data.'))}
+  model_rows <- nrow(mf)
+  diff_rows <- raw_rows - model_rows
 
-  #Build Model
-  mod <- lm(formula = formula, data = mf, na.action = na.exclude)
+  if (diff_rows > 0) {
+    print(paste(as.character(diff_rows), "rows removed due to NA/Nan/Inf values in data."))
+  }
+
+  mod <- stats::lm(formula = formula, data = mf, na.action = stats::na.exclude)
+
+  bf10 <- NA_real_
 
   tryCatch({
-    bf <- '--'
-    bf <- BayesFactor::regressionBF(formula = formula, data = mf)
-  },error=function(e) {
-    print(e)
-  }
-  )
+    bf_obj <- BayesFactor::regressionBF(formula = formula, data = mf)
+    bf10 <- BayesFactor::extractBF(bf_obj)$bf[1]
+  }, error = function(e) {
+    message("Bayes factor could not be computed: ", e$message)
+  })
 
-  #descriptives
-  res_list <- report_lm(mod,deparse(formula),bayes_factor=bf)
-  res_list
+  report_lm(mod, deparse(formula), bayes_factor = bf10)
 }

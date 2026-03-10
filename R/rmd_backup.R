@@ -4,68 +4,67 @@
 #'
 #' @export
 #'
-rmd_backup <- function(search = '*') {
-  search_pth <- paste(search,'.Rmd',sep = '')
+rmd_backup <- function(search = "*") {
+  backup_dir <- file.path("Prompt", "rmd_backups")
+  dir.create(backup_dir, recursive = TRUE, showWarnings = FALSE)
 
-  #Create dir if it doesn't exist
-  dir.create(file.path('Prompt', 'rmd_backups'),showWarnings = FALSE)
-  pth_del = ''
+  search_path <- paste0(search, ".Rmd")
+  current_files <- Sys.glob(search_path)
 
-  ff <- data.frame(id = numeric()
-                   ,path = character()
-                   ,stem = character()
-                   ,stem_date = character()
-                   ,stem_nd = character()
-                   ,hash = character())
-  i <- 1
-
-  #get list of current files in directory with hashes
-  for (x in list.files('Prompt/rmd_backups', full.names = TRUE, pattern = '*.Rmd')) {
-    stem <- sub(pattern = "(.*)\\..*$", replacement = "\\1", basename(x))
-    st_sp <- stringr::str_split(stem, "_")
-    dt_cd <- st_sp[[1]][length(st_sp[[1]])]
-    stem_nd <- paste(st_sp[[1]][0:(length(st_sp[[1]])-1)],collapse='_')
-    hash <- rlang::hash_file(x)
-
-    vec <- c(i,x,stem,dt_cd,stem_nd,hash)
-    ff[i,] <- vec
-    i = i+1
+  if (length(current_files) == 0) {
+    return(invisible(NULL))
   }
 
-
-  #find all .Rmd matching search pattern
-  for (x in Sys.glob(search_pth)) {
-    n_stem = print(sub(pattern = "(.*)\\..*$", replacement = "\\1", basename(x)))
-    bk <- paste('Prompt/rmd_backups/',n_stem,'_',format(Sys.time(), "%Y%m%d%H%M%S"),'.Rmd' , sep = '')
-    n_hash = rlang::hash_file(x)
-
-    cnt <- ff %>%
-      filter(hash == n_hash) %>%
-      summarise(n())
-
-    if (cnt[[1]] > 0) {
-      #There is a file with the same hash
-      pth_del <- ff %>%
-        filter(stem_nd == n_stem & hash == n_hash) %>%
-        arrange(desc(stem_date)) %>%
-        slice(1:1) %>%
-        select(path)
+  for (x in current_files) {
+    if (!file.exists(x)) {
+      next
     }
 
+    stem <- tools::file_path_sans_ext(basename(x))
+    current_hash <- rlang::hash_file(x)
 
-    #write new file current version of these files
-    file.copy(from=x, to=bk,
-              overwrite = TRUE, recursive = FALSE,
-              copy.mode = TRUE)
+    stem_escaped <- gsub("([][{}()+*^$|\\\\?.])", "\\\\\\1", stem)
 
-    if(length(pth_del[[1]]) >0) {
-      #if an existing file with the same hash replace the most recent (delete)
-      #There is a file to delete
-      if (file.exists(pth_del[[1]])){
-        file.remove(pth_del[[1]])
+    backup_files <- list.files(
+      path = backup_dir,
+      pattern = paste0("^", stem_escaped, "_[0-9]{14}(_[[:xdigit:]]{8})?\\.Rmd$"),
+      full.names = TRUE
+    )
+
+    has_match <- FALSE
+
+    if (length(backup_files) > 0) {
+      backup_hashes <- vapply(
+        backup_files,
+        FUN = rlang::hash_file,
+        FUN.VALUE = character(1),
+        USE.NAMES = FALSE
+      )
+      has_match <- current_hash %in% backup_hashes
+    }
+
+    if (!has_match) {
+      timestamp <- format(Sys.time(), "%Y%m%d%H%M%S")
+      short_hash <- substr(current_hash, 1, 8)
+
+      backup_path <- file.path(
+        backup_dir,
+        paste0(stem, "_", timestamp, "_", short_hash, ".Rmd")
+      )
+
+      ok <- file.copy(
+        from = x,
+        to = backup_path,
+        overwrite = FALSE,
+        recursive = FALSE,
+        copy.mode = TRUE
+      )
+
+      if (!ok) {
+        warning("Backup failed for file: ", x, call. = FALSE)
       }
-
     }
-
   }
+
+  invisible(NULL)
 }

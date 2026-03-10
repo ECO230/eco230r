@@ -11,10 +11,10 @@
 #' @return A list of output for reporting $analysis_type, $results, $descriptive_statistics, $post_hoc_analysis
 #' @export
 #'
-#' @examples ano_results <- ano_data %>% ano(sleeptime ~ light)
-#' ano_results <- ano(sleeptime ~ light, ano_data)
-#' ano_results <- ano(ano_data, sleeptime ~ light)
-#' ano_results <- ano(ano_data$sleeptime ~ ano_data$light)
+#' @examples ano_results <- napData %>% ano(naptime ~ light)
+#' ano_results <- ano(naptime ~ light, napData)
+#' ano_results <- ano(napData, naptime ~ light)
+#' ano_results <- ano(napData$naptime ~ napData$light)
 ano <- function(x, y = NULL, tr = .1, min_n = 5, max_cat = 10) {
 
   fd <- is.formula(x) * is.data.frame(y)
@@ -108,7 +108,8 @@ ano <- function(x, y = NULL, tr = .1, min_n = 5, max_cat = 10) {
     Dfr <- aov$df2
     Fv <- aov$test
     p <- aov$p.value
-    w <- aov$effsize
+    effect_label <- "\u03BE"   # ξ
+    effect_value <- aov$effsize
     an <- paste('Homogeneity of Variance is not assumed, Robust One Way ANOVA for medians, ', as.character(tr), ' trimmed means, Post Hocs using linear equality constraints')
     pd <- data.frame(ph[[1]])
     lab <- pd[,1:2]
@@ -119,18 +120,19 @@ ano <- function(x, y = NULL, tr = .1, min_n = 5, max_cat = 10) {
     ph <- pd[,c('psihat','p.value')]
     colnames(ph) <- c('Difference','P.Value')
     ph$P.Value <- signif(ph$P.Value,3)
+    bf10 <- NA_real_
+
     tryCatch({
-      bf <- '--'
-      bf <- BayesFactor::anovaBF(formula,mf)
-    },error=function(e) {
-      print(e)
-    }
-    )
+      bf_obj <- BayesFactor::anovaBF(formula, mf)
+      bf10 <- BayesFactor::extractBF(bf_obj)$bf[1]
+    }, error=function(e) {
+      message("Bayes factor could not be computed: ", e$message)
+    })
 
   } else {
-    aov <- aov(mf)
-    ph <- TukeyHSD(aov)
-    df <- data.frame(summary(aov)[[1]])
+    aov_mod <- stats::aov(formula, data = mf)
+    ph <- TukeyHSD(aov_mod)
+    df <- data.frame(summary(aov_mod)[[1]])
     Dfm <- df[1,1]
     Dfr <- df[2,1]
     SSm <- df[1,2]
@@ -142,30 +144,40 @@ ano <- function(x, y = NULL, tr = .1, min_n = 5, max_cat = 10) {
     p <- df[1,5]
     w2 <- (SSm - (Dfm * MSr))/(SSt + MSr)
     w <- sqrt(abs(w2))
+    omega2 <- NA_real_
+
+    omega2 <- NA_real_
+    tryCatch({
+      omega2 <- effectsize::omega_squared(aov_mod)$Omega2[1]
+    }, error = function(e) {
+      message("Omega squared could not be computed: ", e$message)
+    })
+
+    effect_label <- "\u03C9\u00B2"   # ω²
+    effect_value <- omega2
+
     an <- 'Homogeneity of Variance is assumed, One Way ANOVA, Post Hocs using Tukeys Honest Significance Difference'
     ph <- data.frame(ph[[1]])
     ph <- ph[,c('diff','p.adj')]
     colnames(ph) <- c('Difference','P.Value')
     ph$P.Value <- signif(ph$P.Value,3)
+    bf10 <- NA_real_
+
     tryCatch({
-      bf <- '--'
-      bf <- BayesFactor::anovaBF(formula,mf)
-    },error=function(e) {
-      print(e)
-    }
-    )
+      bf_obj <- BayesFactor::anovaBF(formula, mf)
+      bf10 <- BayesFactor::extractBF(bf_obj)$bf[1]
+    }, error=function(e) {
+      message("Bayes factor could not be computed: ", e$message)
+    })
   }
 
-  if(typeof(bf)=='character'){
-    #error in bayes factor calculation should return bf <- '-'
-    byfct <- bf
-    }
-  else{
-    byfct <- as.data.frame(bf)[1,'bf']
-    byfct <- round(byfct,3)
-  }
 
-  res <- paste(c('F(', round(Dfm,2), ',', round(Dfr,2), ') = ', round(Fv,3),', p = ', round(p,3),', w = ',round(w,3),', bf10 = ',byfct), collapse = '')
+  res <- paste0(
+    "F(", round(Dfm,2), ",", round(Dfr,2), ") = ", round(Fv,3),
+    ", ", format_p(p),
+    ", ", effect_label, " = ", round(effect_value,3),
+    ", bf10 = ", format_bf(bf10)
+  )
   dsc <- desc_e(x = formula, y = mf, 'ano',deparse(substitute(formula)),deparse(substitute(data)))
   list('analysis_type' = an,'results' = res,'descriptive_statistics' = dsc,'post_hoc_analysis' = ph)
 }

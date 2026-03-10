@@ -24,8 +24,8 @@ A list of output for reporting $analysis_type, $results, $descriptive_statistics
 This function will generate output for Analysis of Variance. Homogeneity of Variance (HOV) assumption is tested.  If AOV is assumed aov() is performed and Tukey's HSD are used for post hoc analysis. If HOV cannot be assumed robust ANOVA t1way() from WRS2 is used to perform analysis and linear constraints are used for post hoc analysis.
 }
 \examples{
-ano_results <- ano_data \%>\% ano(sleeptime ~ light)
-ano_results <- ano(sleeptime ~ light, ano_data)
-ano_results <- ano(ano_data, sleeptime ~ light)
-ano_results <- ano(ano_data$sleeptime ~ ano_data$light)
+ano_results <- napData \%>\% ano(naptime ~ light)
+ano_results <- ano(naptime ~ light, napData)
+ano_results <- ano(napData, naptime ~ light)
+ano_results <- ano(napData$naptime ~ napData$light)
 }

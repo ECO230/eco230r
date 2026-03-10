@@ -18,8 +18,8 @@ A list of output for reporting $analysis_type, $results, $linear_regression_mode
 This function performs a simple linear regression and returns reporting information on the model.
 }
 \examples{
-slr_results <- sales_data \%>\% slr(sales ~ adverts)
-slr_results <- slr(sales ~ adverts, sales_data)
-slr_results <- slr(sales_data, sales ~ adverts)
-slr_results < slr(sales_data$sales ~ sales_data$adverts)
+slr_results <- napData \%>\% slr(naptime ~ timestamp)
+slr_results <- slr(naptime ~ timestamp, napData)
+slr_results <- slr(napData, naptime ~ timestamp)
+slr_results <- slr(napData$naptime ~ napData$timestamp)
 }

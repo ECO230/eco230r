@@ -20,9 +20,9 @@ A list of output for reporting $analysis_type, $results, $fit_model, $observed, 
 This function performs a Chi Sqare test for Goodness of Fit on one factor and returns reporting information on the model.
 }
 \examples{
-x2_results <- x2_data \%>\% csf(~class_rank)
-x2_results <- x2_data \%>\% csf(~class_rank,probs = c(500,147,24,39,111))
-x2_results <- x2_data \%>\% csf(~class_rank,probs = c(.61, .18, .03, .05, .13))
-x2_results <- csf(x2_data$class_rank)
-x2_results <- csf(x2_data$class_rank,probs = c(500,147,24,39,111))
+x2_results <- tea_tab \%>\% csf(~cool_time)
+x2_results <- tea_tab \%>\% csf(~cool_time,probs = c(20,50,15,15))
+x2_results <- tea_tab \%>\% csf(~cool_time,probs = c(.20,.50,.15,.15))
+x2_results <- csf(tea_tab$cool_time)
+x2_results <- csf(tea_tab$cool_time,probs = c(20,50,15,15))
 }

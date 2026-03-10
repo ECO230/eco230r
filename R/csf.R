@@ -8,11 +8,11 @@
 #' @return A list of output for reporting $analysis_type, $results, $fit_model, $observed, $expected, $standardized_residuals, $contribution, $table_percentages
 #' @export
 #'
-#' @examples x2_results <- x2_data %>% csf(~class_rank)
-#' x2_results <- x2_data %>% csf(~class_rank,probs = c(500,147,24,39,111))
-#' x2_results <- x2_data %>% csf(~class_rank,probs = c(.61, .18, .03, .05, .13))
-#' x2_results <- csf(x2_data$class_rank)
-#' x2_results <- csf(x2_data$class_rank,probs = c(500,147,24,39,111))
+#' @examples x2_results <- tea_tab %>% csf(~cool_time)
+#' x2_results <- tea_tab %>% csf(~cool_time,probs = c(20,50,15,15))
+#' x2_results <- tea_tab %>% csf(~cool_time,probs = c(.20,.50,.15,.15))
+#' x2_results <- csf(tea_tab$cool_time)
+#' x2_results <- csf(tea_tab$cool_time,probs = c(20,50,15,15))
 csf <- function(x,y=NULL,probs=NULL) {
   fd <- is.formula(x) * is.data.frame(y)
   df <- is.data.frame(x) * is.formula(y)
@@ -105,10 +105,21 @@ csf <- function(x,y=NULL,probs=NULL) {
     mod <- chisq.test(tab)
   }
 
+  if (!missing(probs)) {
+    bf <- bf_gof_multinom(mod$observed, p0 = pab[[2]])
+  } else {
+    bf <- bf_gof_multinom(mod$observed)
+  }
+
+  bf10 <- bf$BF10
+  bf01 <- bf$BF01
+
   Df <- mod$parameter[[1]]
   p <- mod$p.value
   Xv <- mod$statistic
   mrows <- nrow(mod$observed)
+  coh_w <- effectsize::cohens_w(mod)
+  cw <- coh_w$Cohens_w
 
   an <- paste(c('Chi Square Test of Goodness of Fit model on x=',x_name,' (',mrows,' levels)'), collapse = '')
 
@@ -133,7 +144,12 @@ csf <- function(x,y=NULL,probs=NULL) {
   con <- data.frame(con)
   colnames(con) <- c(x_name,'Perc')
 
-  res <- paste(c('X2(', round(Df,2), ') = ', round(Xv,3),', p = ', round(p,3)), collapse = '')
+  res <- paste0(
+    'X2(', round(Df,2), ') = ', round(Xv,3),
+    ', ', format_p(p),
+    ', w = ', round(cw,3),
+    ', bf10 = ', format_bf(bf10)
+  )
 
   list('analysis_type' = an,'results' = res,'fit_model' = ppc, 'observed' = obs, 'expected' = exp,
        'standardized_residuals' = std, 'contribution' = con, 'table_percentages' = tab)
