@@ -1,2 +1,14 @@
+# renv project library (do NOT commit)
+renv/library/
+renv/staging/
+
+# old packrat artifacts
 packrat/lib*/
-.Rproj.user
+
+# RStudio project files
+.Rproj.user/
+
+# R session files
+.Rhistory
+.RData
+.Ruserdata

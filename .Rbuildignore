@@ -1,5 +1,8 @@
+^renv$
+^renv\.lock$
 ^packrat/
 ^\.Rprofile$
-^.*\.Rproj$
 ^\.Rproj\.user$
+^.*\.Rproj$
 ^LICENSE\.md$
+^renv/staging$

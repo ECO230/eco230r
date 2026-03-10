@@ -24,7 +24,7 @@ final_load <- function() {
     hash <- digest::digest(usr, algo = "sha256")
     df$PIN <- paste0(hash, df$ID)
     df$Data_Accessed <- fud
-    df <- subset(df, select = -c(ID))
+    df$ID <- NULL
 
     utils::write.csv(df, "pbgc_clean.csv", row.names = FALSE)
 

@@ -5,7 +5,7 @@ Version: 0.1.0
 Authors@R: 
     person("Mike", "Boland", email = "mboland@uwlax.edu", role = c("aut", "cre"))
 Description: Helper functions, datasets, and reporting tools used in the
-    University of Wisconsin–La Crosse course ECO 230: Data Analysis.
+    University of Wisconsin-La Crosse course ECO 230: Data Analysis.
     The package provides simplified workflows for descriptive statistics,
     tables, hypothesis tests (t-tests, ANOVA, chi-square, etc.), regression,
     and formatted output so students can focus on interpretation rather
@@ -24,6 +24,12 @@ Imports:
     readr,
     rlang,
     WRS2
+Suggests:
+    devtools,
+    knitr,
+    roxygen2,
+    rmarkdown,
+    testthat
 URL: https://github.com/ECO230/eco230r
 BugReports: https://github.com/ECO230/eco230r/issues
 Roxygen: list(markdown = TRUE)
