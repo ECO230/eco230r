@@ -20,8 +20,8 @@ A list of output for reporting $analysis_type, $results, $descriptive_statistics
 This function will generate the output for an independent t-test.
 }
 \examples{
-idt_results <- idt_data \%>\% idt(scones ~ tea)
-idt_results <- idt(idt_data$scones ~ idt_data$tea, tails = 1)
-idt_results <- idt(scones ~ tea, idt_data)
-idt_results <- idt(idt_data, scones ~ tea)
+idt_results <- t_tall \%>\% idt(scones ~ tea)
+idt_results <- idt(t_tall$scones ~ t_tall$tea, tails = 1)
+idt_results <- idt(scones ~ tea, t_tall)
+idt_results <- idt(t_tall, scones ~ tea)
 }

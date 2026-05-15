@@ -1,17 +1,36 @@
 Package: eco230r
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Helper Functions for ECO 230 Data Analysis Workflows
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Authors@R: 
+    person("Mike", "Boland", email = "mboland@uwlax.edu", role = c("aut", "cre"))
+Description: Helper functions, datasets, and reporting tools used in the
+    University of Wisconsin-La Crosse course ECO 230: Data Analysis.
+    The package provides simplified workflows for descriptive statistics,
+    tables, hypothesis tests (t-tests, ANOVA, chi-square, etc.), regression,
+    and formatted output so students can focus on interpretation rather
+    than coding syntax.
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports:
-    car,
-    WRS2,
     BayesFactor,
-    forcats
-RoxygenNote: 7.3.2
+    car,
+    digest,
+    effectsize,
+    forcats,
+    lubridate,
+    magrittr,
+    readr,
+    rlang,
+    WRS2
+Suggests:
+    devtools,
+    knitr,
+    roxygen2,
+    rmarkdown,
+    testthat
+URL: https://github.com/ECO230/eco230r
+BugReports: https://github.com/ECO230/eco230r/issues
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3

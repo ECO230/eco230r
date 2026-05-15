@@ -22,10 +22,10 @@ A list of output for reporting $analysis_type, $results, $descriptive_statistics
 This function will generate the output for a paired samples t-test.
 }
 \examples{
-pst_results <- pst_data \%>\% pst(~scones, ~tea)
-pst_results <- pst(pst_data$black_tea, pst_data$green_tea, tails = 1)
-pst_results <- pst(pst_data, ~scones, ~tea)
-pst_results <- pst(~scones, ~tea, pst_data)
-pst_results <- pst(pst_data$black_tea, pst_data$green_tea)
-pst_results <- pst(scones ~ tea, pst_data_tall)
+pst_results <- t_wide \%>\% pst(~black_tea, ~green_tea)
+pst_results <- pst(t_wide$black_tea, t_wide$green_tea, tails = 1)
+pst_results <- pst(t_wide, ~black_tea, ~green_tea)
+pst_results <- pst(~black_tea, ~green_tea, t_wide)
+pst_results <- pst(t_wide$black_tea, t_wide$green_tea)
+pst_results <- pst(black_tea ~ green_tea, t_wide)
 }

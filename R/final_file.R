@@ -2,10 +2,22 @@
 #'
 #'This function will tell if there is an issue with the data file
 #' @export
-final_file <- function(){
-library(digest)
-    truth <- read_csv('pbgc_clean.csv')[[1,1]] == paste(digest(Sys.getenv('RSTUDIO_USER_IDENTITY_DISPLAY'),algo='sha256'),1,sep='')[1]
-  test <- paste('File Hash Match:',as.character(truth))
-  hash <- as.character(Sys.getenv('R_FILE_HASH'))
-  return(c(test,hash))
+final_file <- function() {
+  if (!file.exists("pbgc_clean.csv")) {
+    stop("File 'pbgc_clean.csv' was not found in the working directory.", call. = FALSE)
+  }
+
+  stored_hash <- Sys.getenv("R_FILE_HASH", unset = NA_character_)
+
+  if (is.na(stored_hash) || stored_hash == "") {
+    stop("R_FILE_HASH is not set.", call. = FALSE)
+  }
+
+  current_hash <- digest::digest(file = "pbgc_clean.csv", algo = "sha256")
+  truth <- identical(current_hash, stored_hash)
+
+  c(
+    paste("File Hash Match:", truth),
+    paste("Stored Hash:", stored_hash)
+  )
 }

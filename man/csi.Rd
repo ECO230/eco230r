@@ -10,6 +10,8 @@ csi(x, y = NULL, z = NULL)
 \item{x}{A formula dependent variable ~ independent variable.}
 
 \item{y}{A data frame, necessary if data frame is not referenced in formula or piped in.}
+
+\item{z}{A data frame, necessary if data frame is not referenced in formula or piped in to support form var,var,df.}
 }
 \value{
 A list of output for reporting $analysis_type, $results, $odds_ratio, $observed, $expected, $standardized_residuals, $contribution, $table_percentages, $column_percentages, $row_percentages
@@ -18,7 +20,7 @@ A list of output for reporting $analysis_type, $results, $odds_ratio, $observed,
 This function performs a Chi Sqare test for association on two factors and returns reporting information on the model.
 }
 \examples{
-x2_results <- x2_data \%>\% csi(class_rank ~ gender)
-x2_results <- csi(class_rank ~ gender, x2_data)
-x2_results <- csi(x2_data$class_rank, x2_data$gender)
+x2_results <- tea_tab \%>\% csi(cool_time ~ tea_type)
+x2_results <- csi(cool_time ~ tea_type, tea_tab)
+x2_results <- csi(tea_tab$cool_time, tea_tab$tea_type)
 }

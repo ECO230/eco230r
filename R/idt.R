@@ -9,10 +9,10 @@
 #' @return A list of output for reporting $analysis_type, $results, $descriptive_statistics
 #' @export
 #'
-#' @examples idt_results <- idt_data %>% idt(scones ~ tea)
-#' idt_results <- idt(idt_data$scones ~ idt_data$tea, tails = 1)
-#' idt_results <- idt(scones ~ tea, idt_data)
-#' idt_results <- idt(idt_data, scones ~ tea)
+#' @examples idt_results <- t_tall %>% idt(scones ~ tea)
+#' idt_results <- idt(t_tall$scones ~ t_tall$tea, tails = 1)
+#' idt_results <- idt(scones ~ tea, t_tall)
+#' idt_results <- idt(t_tall, scones ~ tea)
 idt <- function(x, y = NULL, tails = 2) {
   fd <- is.formula(x) * is.data.frame(y)
   df <- is.data.frame(x) * is.formula(y)
@@ -60,13 +60,36 @@ idt <- function(x, y = NULL, tails = 2) {
   #build model
   mod <- t.test(formula = formula, data = mf)
 
-  tryCatch({
-    bf <- '--'
-    bf <- BayesFactor::ttestBF(formula = formula, data = mf)
-  },error=function(e) {
-    print(e)
+  # group sizes
+  grp <- mf[[2]]
+  group_levels <- levels(grp)
+
+  if (length(group_levels) != 2) {
+    stop("Independent t-test requires exactly 2 groups.")
   }
-  )
+
+  g1 <- mf[[1]][grp == group_levels[1]]
+  g2 <- mf[[1]][grp == group_levels[2]]
+
+  n1 <- length(g1)
+  n2 <- length(g2)
+
+  m1 <- mean(g1, na.rm = TRUE)
+  m2 <- mean(g2, na.rm = TRUE)
+  sd1 <- sd(g1, na.rm = TRUE)
+  sd2 <- sd(g2, na.rm = TRUE)
+
+  sp <- sqrt(((n1 - 1) * sd1^2 + (n2 - 1) * sd2^2) / (n1 + n2 - 2))
+  d <- (m1 - m2) / sp
+
+  # Bayes factor: BF10
+  bf10 <- NA_real_
+  tryCatch({
+    bf_obj <- BayesFactor::ttestBF(formula = formula, data = mf)
+    bf10 <- BayesFactor::extractBF(bf_obj)$bf[1]
+  }, error = function(e) {
+    message("Bayes factor could not be computed: ", e$message)
+  })
 
   if (tails ==2) {
     an <- 'Independent t-Test, Two Tailed test'
@@ -75,7 +98,7 @@ idt <- function(x, y = NULL, tails = 2) {
   }
 
   #descriptives
-  res_list <- report_t(mod, tails = tails, an, bayes_factor=bf)
+  res_list <- report_t(mod, tails = tails, an, bayes_factor=bf10,cohen_d=d)
   dsc <- desc_e(formula, mf, 'idt',deparse(substitute(formula)),deparse(substitute(mf)))
   list('analysis_type' = res_list[[1]], 'results' = res_list[[2]], 'descriptive_statistics' = dsc)
 }

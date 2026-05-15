@@ -1,4 +1,4 @@
-report_t <- function(model_t,tails,analysis_desc,bayes_factor) {
+report_t <- function(model_t,tails,analysis_desc,bayes_factor,cohen_d) {
   t <- model_t$statistic
   p <- model_t$p.value
   Df <- model_t$parameter
@@ -15,6 +15,6 @@ report_t <- function(model_t,tails,analysis_desc,bayes_factor) {
 
   if (tails == 1) {p <- p/2}
 
-  res <- paste(c('t(', round(Df,2), ') = ', round(t,3),', p = ', round(p,3),', r = ',round(r,3),', bf10 = ',byfct), collapse = '')
+  res <- paste(c('t(', round(Df,2), ') = ', round(t,3),', ', format_p(p),', d = ',round(cohen_d,3),', bf10 = ',format_bf(byfct)), collapse = '')
   list('analysis_type' = analysis_desc,'results' = res)
 }
